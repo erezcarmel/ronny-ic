@@ -1,0 +1,105 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for admin authentication
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Section model for website sections (Hero, About, etc.)
+model Section {
+  id          String        @id @default(uuid())
+  name        String
+  type        String        // e.g., "hero", "about", "contact"
+  orderIndex  Int
+  isPublished Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  contents    SectionContent[]
+}
+
+// Section content with language support
+model SectionContent {
+  id        String   @id @default(uuid())
+  sectionId String
+  section   Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  language  String   // "en" or "he"
+  title     String?
+  subtitle  String?
+  content   String?  @db.Text
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sectionId, language])
+}
+
+// Article/Blog model
+model Article {
+  id          String          @id @default(uuid())
+  slug        String          @unique
+  isPublished Boolean         @default(false)
+  publishDate DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  contents    ArticleContent[]
+}
+
+// Article content with language support
+model ArticleContent {
+  id          String   @id @default(uuid())
+  articleId   String
+  article     Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  language    String   // "en" or "he"
+  title       String
+  excerpt     String?  @db.Text
+  content     String?  @db.Text
+  pdfUrl      String?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([articleId, language])
+}
+
+// Contact information
+model ContactInfo {
+  id        String   @id @default(uuid())
+  language  String   // "en" or "he"
+  phone     String?
+  email     String?
+  whatsapp  String?
+  address   String?  @db.Text
+  mapUrl    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([language])
+}
+
+// Media assets
+model Media {
+  id        String   @id @default(uuid())
+  filename  String
+  path      String
+  type      String   // "image", "pdf", etc.
+  size      Int
+  mimeType  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

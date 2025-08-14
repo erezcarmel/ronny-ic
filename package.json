@@ -1,0 +1,21 @@
+{
+  "name": "ronnyic",
+  "version": "1.0.0",
+  "description": "Ronny Iss-Carmel Professional Website",
+  "scripts": {
+    "start": "concurrently \"npm run server-start\" \"npm run client-start\"",
+    "client": "cd client && npm run dev",
+    "client-start": "cd client && npm run build && npm run start",
+    "server": "cd server && npm run dev",
+    "server-start": "cd server && npm run build && npm run start",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "build": "npm run install:all && cd client && npm run build && cd ../server && npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
