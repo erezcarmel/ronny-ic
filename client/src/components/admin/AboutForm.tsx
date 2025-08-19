@@ -74,10 +74,11 @@ export default function AboutForm({ initialData, onSubmit, onCancel }: AboutForm
   };
   
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+    const files = e.target.files;
+    if (files && files.length > 0) {
       // In a real application, you would upload the file to a server
       // and get back a URL. For now, we'll just use a placeholder.
-      setFormData(prev => ({ ...prev, imageUrl: URL.createObjectURL(e.target.files[0]) }));
+      setFormData(prev => ({ ...prev, imageUrl: URL.createObjectURL(files[0]) }));
     }
   };
   
