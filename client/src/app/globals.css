@@ -39,8 +39,16 @@ body {
 .section {
   @apply py-16 max-w-4xl mx-auto my-0;
 
-  &.article-section {
-    @apply max-w-full;
+  &.contact-section {
+    @apply pt-0;
+  }
+
+  &.article-section, &.services-section {
+    @apply max-w-full pb-0;
+
+    .container-custom {
+      @apply max-w-4xl;
+    }
   }
 }
 

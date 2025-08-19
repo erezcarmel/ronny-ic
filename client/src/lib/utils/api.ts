@@ -141,14 +141,25 @@ export const apiService = {
   sections: {
     getAll: (language?: string) => 
       apiRequest('GET', `/sections?language=${language || 'en'}`),
-    getById: (id: string, language?: string) => 
-      apiRequest('GET', `/sections/${id}?language=${language || 'en'}`),
+    getById: (id: string, language?: string, admin: boolean = false) => 
+      apiRequest('GET', `/sections/${id}?language=${language || 'en'}&admin=${admin}`),
+    getByType: (type: string, language?: string) => 
+      apiRequest('GET', `/sections/type/${type}?language=${language || 'en'}`),
     create: (data: any) => 
       apiRequest('POST', '/sections', data),
     update: (id: string, data: any) => 
       apiRequest('PUT', `/sections/${id}`, data),
     delete: (id: string) => 
       apiRequest('DELETE', `/sections/${id}`),
+    uploadFile: (file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      return apiRequest('POST', '/sections/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    },
   },
   
   // Articles endpoints

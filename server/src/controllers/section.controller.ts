@@ -30,16 +30,48 @@ export const getAllSections = async (req: Request, res: Response) => {
   }
 };
 
+// Get section by type
+export const getSectionByType = async (req: Request, res: Response) => {
+  try {
+    const { type } = req.params;
+    const { language = 'en' } = req.query;
+    
+    const section = await prisma.section.findFirst({
+      where: { 
+        type: String(type),
+        isPublished: true 
+      },
+      include: {
+        contents: {
+          where: {
+            language: String(language),
+          },
+        },
+      },
+    });
+
+    if (!section) {
+      return res.status(404).json({ message: 'Section not found' });
+    }
+
+    res.status(200).json(section);
+  } catch (error) {
+    console.error('Get section by type error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 // Get section by ID
 export const getSectionById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { language = 'en' } = req.query;
+    const { language = 'en', admin = 'false' } = req.query;
     
+    // For admin view, include all languages
     const section = await prisma.section.findUnique({
       where: { id },
       include: {
-        contents: {
+        contents: admin === 'true' ? true : {
           where: {
             language: String(language),
           },
@@ -62,6 +94,10 @@ export const getSectionById = async (req: Request, res: Response) => {
 export const createSection = async (req: Request, res: Response) => {
   try {
     const { name, type, orderIndex, isPublished = true, contents } = req.body;
+    
+    console.log('Creating new section');
+    console.log('Request body:', req.body);
+    console.log('Contents:', contents);
 
     // Validate input
     if (!name || !type || orderIndex === undefined || !contents || !Array.isArray(contents)) {
@@ -102,6 +138,10 @@ export const updateSection = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { name, type, orderIndex, isPublished, contents } = req.body;
+    
+    console.log('Updating section:', id);
+    console.log('Request body:', req.body);
+    console.log('Contents:', contents);
 
     // Check if section exists
     const existingSection = await prisma.section.findUnique({
@@ -141,17 +181,38 @@ export const updateSection = async (req: Request, res: Response) => {
             },
           });
         } else {
-          // Create new content
-          await prisma.sectionContent.create({
-            data: {
+          // Check if content for this language already exists
+          const existingContent = await prisma.sectionContent.findFirst({
+            where: {
               sectionId: id,
               language: content.language,
-              title: content.title,
-              subtitle: content.subtitle,
-              content: content.content,
-              imageUrl: content.imageUrl,
             },
           });
+          
+          if (existingContent) {
+            // Update existing content
+            await prisma.sectionContent.update({
+              where: { id: existingContent.id },
+              data: {
+                title: content.title,
+                subtitle: content.subtitle,
+                content: content.content,
+                imageUrl: content.imageUrl,
+              },
+            });
+          } else {
+            // Create new content
+            await prisma.sectionContent.create({
+              data: {
+                sectionId: id,
+                language: content.language,
+                title: content.title,
+                subtitle: content.subtitle,
+                content: content.content,
+                imageUrl: content.imageUrl,
+              },
+            });
+          }
         }
       }
     }

@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { rateLimit } from 'express-rate-limit';
 import routes from './routes';
+import createDefaultContactInfo from './scripts/createDefaultContactInfo';
 
 // Load environment variables
 dotenv.config();
@@ -39,9 +40,19 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// Start server
-app.listen(PORT, () => {
+// Start server first
+const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  
+  // Try to set up contact info, but don't crash if database is not available
+  createDefaultContactInfo()
+    .then(() => {
+      console.log('Contact information setup complete');
+    })
+    .catch((error) => {
+      console.error('Error setting up contact information:', error);
+      console.log('Server will continue running without contact info setup');
+    });
 });
 
 export default app;

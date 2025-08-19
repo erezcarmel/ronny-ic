@@ -8,6 +8,7 @@ import { isSectionVisible } from '@/i18n/config/sections';
 // Import section components
 import Hero from '@/components/sections/Hero';
 import About from '@/components/sections/About';
+import Services from '@/components/sections/Services';
 import Articles from '@/components/sections/Articles';
 import Contact from '@/components/sections/Contact';
 
@@ -33,6 +34,9 @@ export default function Home() {
       
       {/* About Section */}
       <About />
+      
+      {/* Services Section */}
+      <Services />
       
       {/* Articles Section - conditionally rendered based on locale */}
       {isSectionVisible('articles', locale) && <Articles />}

@@ -46,7 +46,7 @@ export default function Hero({ title, subtitle }: HeroProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-xl md:text-2xl text-gray-800 text-shadow-sm max-w-3xl mx-auto"
+              className="text-xl md:text-2xl text-gray-800 text-shadow-sm max-w-xl mx-auto"
             >
               {subtitle || translations.subtitle}
             </motion.p>
@@ -59,7 +59,7 @@ export default function Hero({ title, subtitle }: HeroProps) {
             >
               <a
                 href="#contact"
-                className="btn btn-outline text-lg px-8 py-3"
+                className="btn btn-outline text-lg px-8 py-3 hover:bg-transparent hover:border-[#555599]"
                 aria-label="Contact me"
               >
                 {translations.contactMe || "Contact Me"}

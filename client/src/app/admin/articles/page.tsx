@@ -213,7 +213,7 @@ export default function ArticlesPage() {
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex gap-2 items-center">
                             <button 
-                              className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3"
+                              className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mx-3"
                               onClick={() => handleEditArticle(article.id)}
                               disabled={isDeleting}
                             >

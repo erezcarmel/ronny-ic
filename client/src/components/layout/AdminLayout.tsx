@@ -4,6 +4,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { getMessages } from '@/i18n/config';
+import LanguageSwitcher from './LanguageSwitcher';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -34,7 +35,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             {dashboardTranslations.title}
           </h1>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex gap-4 items-center">
+            <LanguageSwitcher />
+            
             <Link 
               href="/"
               className="text-gray-600 dark:text-gray-300 hover:text-primary-800 dark:hover:text-primary-400"
@@ -61,7 +64,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       </header>
       
       {/* Admin Content */}
-      <div className="container-custom py-6">
+      <div className="max-w-fit mx-auto py-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Sidebar */}
           <aside className="md:col-span-1">

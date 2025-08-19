@@ -2,6 +2,7 @@
   "navigation": {
     "home": "Home",
     "about": "About",
+    "services": "Services",
     "articles": "Articles",
     "contact": "Contact",
     "title": "Ronny Iss-Carmel",
@@ -9,11 +10,19 @@
   },
   "hero": {
     "title": "Ronny Iss-Carmel",
-    "subtitle": "Psychologist for children, adolescents, young adults and parents",
+    "subtitle": "Psychological associate for children, adolescents, young adults and parents",
     "contactMe": "Contact Me"
   },
   "about": {
     "title": "About Me",
+    "content": "I am a licensed psychologist specializing in children, adolescents, young adults, and parents. With over 15 years of experience, I provide personalized psychological services tailored to each individual's unique needs. My approach combines evidence-based techniques with compassionate care to help clients navigate life's challenges and achieve emotional well-being."
+  },
+  "services": {
+    "title": "Services",
+    "noServices": "No services have been added yet. Please check back later.",
+    "noCards": "No cards available for this service.",
+    "showLess": "Show Less",
+    "readMore": "Read More",
     "sections": {
       "therapy": {
         "name": "Adolescents, young adults, children and parents",

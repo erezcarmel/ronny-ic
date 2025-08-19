@@ -80,7 +80,7 @@ export default function Header() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'hidden sm:block text-gray-600 hover:text-[#B4C4F7] transition-colors',
+                  'hidden sm:block text-gray-600 hover:text-[#555599] transition-colors',
                   pathname === item.href && 'text-primary-800 font-medium'
                 )}
                 aria-current={pathname === item.href ? 'page' : undefined}
