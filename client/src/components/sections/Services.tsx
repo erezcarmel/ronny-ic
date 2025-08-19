@@ -245,7 +245,7 @@ export default function Services({
   });
   
   return (
-    <section id="services" className="section services-section bg-white dark:bg-gray-800 w-full">
+    <section id="services" className={`section services-section bg-white dark:bg-gray-800 w-full max-w-full ${isRtl ? 'pb-0' : 'pb-8'}`}>
       <div className="w-full">
         {loading ? (
           <div className="flex justify-center items-center py-12">
@@ -271,8 +271,8 @@ export default function Services({
                 <>
                   {serviceSections.length > 0 ? (
                     serviceSections.map((section) => (
-                      <div key={section.id} className={section.cards && section.cards.length > 0 ? 'my-16' : 'my-8'}>
-                        <div className={`w-full px-8 sm:px-10 md:px-16 lg:px-24 xl:px-32 ${section.cards && section.cards.length > 0 ? 'mb-10' : ''}`}>
+                      <div key={section.id}>
+                        <div className="w-full px-8 sm:px-10 md:px-16 lg:px-24 xl:px-32 pt-8">
                           <h2 className="text-3xl text-center font-bold mb-4">
                             {section.title}
                           </h2>

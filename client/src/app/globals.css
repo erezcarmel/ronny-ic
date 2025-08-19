@@ -37,14 +37,10 @@ body {
 
 /* Section spacing */
 .section {
-  @apply py-16 max-w-4xl mx-auto my-0;
-
-  &.contact-section {
-    @apply pt-0;
-  }
+  @apply py-8 max-w-4xl mx-auto my-0;
 
   &.article-section, &.services-section {
-    @apply max-w-full pb-0;
+    @apply max-w-full;
 
     .container-custom {
       @apply max-w-4xl;
