@@ -66,7 +66,6 @@ export default function ArticleForm({ articleId, onCancel, onSuccess }: ArticleF
       if (messages.articleForm) {
         setTranslations(messages.articleForm);
       } else {
-        console.log('Falling back to admin.articles translations');
         setTranslations(messages.admin.articleForm);
       }
     });
@@ -195,30 +194,15 @@ export default function ArticleForm({ articleId, onCancel, onSuccess }: ArticleF
       setIsLoading(true);
       setError(null);
       
-      // Log a summary of the form data instead of the full content to avoid console truncation
-      console.log('Submitting form data:', {
-        slug: formData.slug,
-        isPublished: formData.isPublished,
-        publishDate: formData.publishDate,
-        contents: formData.contents.map(c => ({
-          language: c.language,
-          title: c.title,
-          excerpt: c.excerpt ? `${c.excerpt.substring(0, 50)}...` : '',
-          contentLength: c.content ? c.content.length : 0
-        }))
-      });
-      
       // Upload image if selected
       let imageUrl: string | undefined;
       if (imageFile) {
-        console.log('Uploading image file:', imageFile.name);
         imageUrl = await uploadFile(imageFile);
       }
       
       // Upload PDF if selected
       let pdfUrl: string | undefined;
       if (pdfFile) {
-        console.log('Uploading PDF file:', pdfFile.name);
         pdfUrl = await uploadFile(pdfFile);
       }
       
@@ -264,14 +248,10 @@ export default function ArticleForm({ articleId, onCancel, onSuccess }: ArticleF
       let result;
       if (articleId) {
         // Update existing article
-        console.log('Updating article:', articleId);
         result = await apiService.articles.update(articleId, dataToSubmit);
-        console.log('Update result:', result);
       } else {
         // Create new article
-        console.log('Creating new article');
         result = await apiService.articles.create(dataToSubmit);
-        console.log('Create result:', result);
       }
       
       setIsLoading(false);

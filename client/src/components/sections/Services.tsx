@@ -245,7 +245,7 @@ export default function Services({
   });
   
   return (
-    <section id="services" className={`section services-section bg-white dark:bg-gray-800 w-full max-w-full ${isRtl ? 'pb-0' : 'pb-8'}`}>
+    <section id="services" className={`services-section bg-white dark:bg-gray-800 w-full max-w-full ${isRtl ? 'pb-0' : 'pb-8'}`}>
       <div className="w-full">
         {loading ? (
           <div className="flex justify-center items-center py-12">
@@ -273,12 +273,14 @@ export default function Services({
                     serviceSections.map((section) => (
                       <div key={section.id}>
                         <div className="w-full px-8 sm:px-10 md:px-16 lg:px-24 xl:px-32 pt-8">
-                          <h2 className="text-3xl text-center font-bold mb-4">
+                          <h2 className={`text-center font-bold ${section.cards && section.cards.length > 0 ? 'text-3xl mb-4' : 'text-2xl mb-0'}`}>
                             {section.title}
                           </h2>
-                          <div className={`text-base text-center text-gray-700 dark:text-gray-300 mb-2 max-w-6xl mx-auto`}>
-                            <div dangerouslySetInnerHTML={{ __html: section.description }} />
-                          </div>
+                          { section.description && (
+                            <div className={`text-base text-center text-gray-700 dark:text-gray-300 mb-2 max-w-6xl mx-auto`}>
+                              <div dangerouslySetInnerHTML={{ __html: section.description }} />
+                            </div>
+                          )}
                           
                           {section.cards && section.cards.length > 0 && (
                             <div className="flex justify-center">

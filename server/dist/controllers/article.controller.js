@@ -164,7 +164,6 @@ const updateArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             for (const content of contents) {
                 if (content.id) {
                     // Update existing content with ID
-                    console.log(`Updating content with ID: ${content.id}`);
                     yield prisma_1.default.articleContent.update({
                         where: { id: content.id },
                         data: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, (content.title !== undefined && { title: content.title })), (content.excerpt !== undefined && { excerpt: content.excerpt })), (content.content !== undefined && { content: content.content })), (content.pdfUrl !== undefined && { pdfUrl: content.pdfUrl })), (content.imageUrl !== undefined && { imageUrl: content.imageUrl })),
@@ -180,7 +179,6 @@ const updateArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                     });
                     if (existingContent) {
                         // Update existing content for this language
-                        console.log(`Updating existing content for language: ${content.language}`);
                         yield prisma_1.default.articleContent.update({
                             where: { id: existingContent.id },
                             data: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, (content.title !== undefined && { title: content.title })), (content.excerpt !== undefined && { excerpt: content.excerpt })), (content.content !== undefined && { content: content.content })), (content.pdfUrl !== undefined && { pdfUrl: content.pdfUrl })), (content.imageUrl !== undefined && { imageUrl: content.imageUrl })),
@@ -188,7 +186,6 @@ const updateArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                     }
                     else {
                         // Create new content
-                        console.log(`Creating new content for language: ${content.language}`);
                         yield prisma_1.default.articleContent.create({
                             data: {
                                 articleId: id,

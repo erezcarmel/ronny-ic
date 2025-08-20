@@ -94,10 +94,6 @@ export const getSectionById = async (req: Request, res: Response) => {
 export const createSection = async (req: Request, res: Response) => {
   try {
     const { name, type, orderIndex, isPublished = true, contents } = req.body;
-    
-    console.log('Creating new section');
-    console.log('Request body:', req.body);
-    console.log('Contents:', contents);
 
     // Validate input
     if (!name || !type || orderIndex === undefined || !contents || !Array.isArray(contents)) {
@@ -138,10 +134,6 @@ export const updateSection = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { name, type, orderIndex, isPublished, contents } = req.body;
-    
-    console.log('Updating section:', id);
-    console.log('Request body:', req.body);
-    console.log('Contents:', contents);
 
     // Check if section exists
     const existingSection = await prisma.section.findUnique({

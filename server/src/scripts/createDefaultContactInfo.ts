@@ -10,7 +10,6 @@ async function createDefaultContactInfo() {
       console.log('Database connection successful');
     } catch (dbError) {
       console.error('Database connection failed:', dbError);
-      console.log('Skipping contact info setup due to database connection issues');
       return; // Exit function but don't crash the application
     }
 

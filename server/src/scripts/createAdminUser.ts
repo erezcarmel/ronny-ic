@@ -11,7 +11,6 @@ async function createAdminUser() {
     });
 
     if (existingAdmin) {
-      console.log('Admin user already exists');
       return;
     }
 
@@ -27,7 +26,6 @@ async function createAdminUser() {
       },
     });
 
-    console.log('Admin user created successfully:', user.email);
   } catch (error) {
     console.error('Error creating admin user:', error);
   } finally {

@@ -43,7 +43,6 @@ export default function SectionsPage() {
     setIsLoading(true);
     apiService.sections.getAll()
       .then(data => {
-        console.log('Fetched sections:', data);
         if (Array.isArray(data)) {
           setSections(data.map(section => ({
             id: section.id,
@@ -71,7 +70,6 @@ export default function SectionsPage() {
     try {
       // Fetch the full section data with all language contents
       const sectionData = await apiService.sections.getById(section.id, undefined, true);
-      console.log('Fetched section data:', sectionData);
       
       setCurrentSection({
         ...section,
@@ -126,15 +124,11 @@ export default function SectionsPage() {
           contents: [] as any[]
         };
         
-        console.log('Updating existing section:', currentSection.id, currentSection.type);
-        console.log('Form data:', formData);
-        
         // Handle different section types
         if (currentSection.type === 'services') {
           // For services, use the contents directly from the form
           if (formData.contents) {
             apiData.contents = formData.contents;
-            console.log('Using services contents from form:', apiData.contents);
           } else {
             console.warn('No contents found in form data for services!');
           }
@@ -158,7 +152,6 @@ export default function SectionsPage() {
         
         // Call the API
         const result = await apiService.sections.update(currentSection.id, apiData);
-        console.log('Updated section:', result);
         
         // Update local state
         setSections(sections.map(s => 
@@ -178,15 +171,11 @@ export default function SectionsPage() {
           contents: [] as any[]
         };
         
-        console.log('Creating new section with type:', modalType);
-        console.log('Form data:', formData);
-        
         // Handle different section types
         if (modalType === 'services') {
           // For services, use the contents directly from the form
           if (formData.contents) {
             apiData.contents = formData.contents;
-            console.log('Using services contents from form:', apiData.contents);
           } else {
             console.warn('No contents found in form data for services!');
           }
@@ -210,7 +199,6 @@ export default function SectionsPage() {
         
         // Call the API
         const result = await apiService.sections.create(apiData);
-        console.log('Created section:', result);
         
         // Update local state
         const newSection = {

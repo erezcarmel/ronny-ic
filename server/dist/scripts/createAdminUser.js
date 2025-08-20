@@ -23,7 +23,6 @@ function createAdminUser() {
                 where: { email: 'admin@example.com' },
             });
             if (existingAdmin) {
-                console.log('Admin user already exists');
                 return;
             }
             // Create admin user
@@ -36,7 +35,6 @@ function createAdminUser() {
                     role: 'admin',
                 },
             });
-            console.log('Admin user created successfully:', user.email);
         }
         catch (error) {
             console.error('Error creating admin user:', error);

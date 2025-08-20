@@ -47,7 +47,6 @@ export default function ArticleDetailPage() {
         
         // Fetch article data
         const articleData = await apiService.articles.getBySlug(slug, locale);
-        console.log('Article data:', articleData);
         
         setArticle(articleData);
         

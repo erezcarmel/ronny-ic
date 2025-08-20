@@ -75,20 +75,17 @@ export default function Articles({ title, articles = [] }: ArticlesProps) {
     const fetchArticles = async () => {
       try {
         setIsLoading(true);
-        console.log('Fetching articles from API...');
         
         // Only fetch published articles for the public website
         const data = await apiService.articles.getAll(locale, true);
-        console.log('API response:', data);
         
         // Log the structure of the first article to understand its format
         if (data && data.length > 0) {
-          console.log('First article structure:', JSON.stringify(data[0], null, 2));
+          console.log('First artice structure:', JSON.stringify(data[0], null, 2));
           console.log('Article contents array:', data[0].contents);
         }
         
         if (!data || data.length === 0) {
-          console.log('No articles returned from API');
           setLoadedArticles([]);
           setIsLoading(false);
           return;
@@ -99,8 +96,6 @@ export default function Articles({ title, articles = [] }: ArticlesProps) {
           // Find content in the current language, or fallback to the first content
           const content = article.contents.find((c: any) => c.language === locale) || article.contents[0] || {};
           
-          console.log('Article content found:', content);
-          
           const formattedArticle = {
             id: article.id,
             slug: article.slug,
@@ -110,15 +105,12 @@ export default function Articles({ title, articles = [] }: ArticlesProps) {
             pdfUrl: content.pdfUrl,
             publishDate: article.publishDate,
           };
-          console.log('Formatted article:', formattedArticle);
           return formattedArticle;
         });
         
-        console.log('All formatted articles:', formattedArticles);
         setLoadedArticles(formattedArticles);
         setIsLoading(false);
       } catch (error) {
-        console.error('Error fetching articles:', error);
         setError('Failed to load articles');
         setIsLoading(false);
       }
@@ -127,26 +119,17 @@ export default function Articles({ title, articles = [] }: ArticlesProps) {
     fetchArticles();
   }, [locale]);
   
-  // Remove useInView as we're not using it anymore
-  
-  // Log what articles are available
-  console.log('Articles from props:', articles);
-  console.log('Articles from API:', loadedArticles);
-  
   // Use provided articles first, then loaded articles from API
   let displayedArticles: Article[] = [];
   if (articles.length > 0) {
     // Use explicitly provided articles (highest priority)
     displayedArticles = articles;
-    console.log('Using explicitly provided articles');
   } else if (loadedArticles.length > 0) {
     // Use articles loaded from API (second priority)
     displayedArticles = loadedArticles;
-    console.log('Using articles loaded from API');
   } else {
     // No articles available
     displayedArticles = [];
-    console.log('No articles available');
   }
   
   // Navigation functions for the carousel - move one article at a time

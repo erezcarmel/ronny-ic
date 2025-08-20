@@ -36,17 +36,12 @@ export default function ServicesForm({ initialData, onSubmit, onCancel }: Servic
   const [translations, setTranslations] = useState<any>(null);
   const [isRtl, setIsRtl] = useState(false);
   
-  // Debug the initialData
   useEffect(() => {
-    console.log('ServicesForm initialData:', initialData);
     if (initialData?.contents) {
-      console.log('ServicesForm contents:', initialData.contents);
       initialData.contents.forEach((content: any, index: number) => {
-        console.log(`Content ${index} (${content.language}):`, content);
         if (content.content) {
           try {
             const parsedContent = JSON.parse(content.content);
-            console.log(`Parsed content ${index}:`, parsedContent);
           } catch (e) {
             console.error(`Error parsing content ${index}:`, e);
           }
@@ -148,15 +143,12 @@ export default function ServicesForm({ initialData, onSubmit, onCancel }: Servic
       const content = initialData.contents.find((c: any) => c.language === language);
       if (content?.content) {
         try {
-          console.log(`Parsing ${language} content:`, content.content);
           const parsedContent = JSON.parse(content.content);
-          console.log(`Parsed ${language} content:`, parsedContent);
           
           // Check if the content is in the new format with services array
           if (parsedContent && typeof parsedContent === 'object' && !Array.isArray(parsedContent)) {
             // New format with multiple services
             if (parsedContent.services && Array.isArray(parsedContent.services)) {
-              console.log(`Found new services format for ${language}:`, parsedContent);
               return parsedContent.services.map((service: any, index: number) => ({
                 id: `service-${initialData.id}-${index}` || `service-${Date.now()}-${index}`,
                 title: service.title,
@@ -167,7 +159,6 @@ export default function ServicesForm({ initialData, onSubmit, onCancel }: Servic
             
             // Old single service format
             if (parsedContent.title && parsedContent.description && Array.isArray(parsedContent.cards)) {
-              console.log(`Found old single service format for ${language}:`, parsedContent);
               return [{
                 id: initialData.id || `service-${Date.now()}`,
                 title: parsedContent.title,
@@ -180,12 +171,10 @@ export default function ServicesForm({ initialData, onSubmit, onCancel }: Servic
           // Check if the parsed content is an array with the new structure with cards
           if (Array.isArray(parsedContent) && parsedContent.length > 0) {
             if (parsedContent[0].cards) {
-              console.log(`Found array with cards for ${language}:`, parsedContent);
               return parsedContent;
             }
             
             // Convert old format to new format
-            console.log(`Converting old format for ${language}:`, parsedContent);
             return parsedContent.map((section: any) => {
               // Extract sub-items from content if it's HTML
               const subItems = [];
@@ -245,11 +234,9 @@ export default function ServicesForm({ initialData, onSubmit, onCancel }: Servic
     }
     
     // Fallback to direct properties
-    console.log(`Using fallback for ${language}. initialData:`, initialData);
     const fallback = language === 'en' 
       ? (initialData.sectionsEn || defaultSections.en) 
       : (initialData.sectionsHe || defaultSections.he);
-    console.log(`Fallback for ${language}:`, fallback);
     return fallback;
   };
   

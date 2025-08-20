@@ -171,7 +171,6 @@ export const updateArticle = async (req: Request, res: Response) => {
       for (const content of contents) {
         if (content.id) {
           // Update existing content with ID
-          console.log(`Updating content with ID: ${content.id}`);
           await prisma.articleContent.update({
             where: { id: content.id },
             data: {
@@ -193,7 +192,6 @@ export const updateArticle = async (req: Request, res: Response) => {
           
           if (existingContent) {
             // Update existing content for this language
-            console.log(`Updating existing content for language: ${content.language}`);
             await prisma.articleContent.update({
               where: { id: existingContent.id },
               data: {
@@ -206,7 +204,6 @@ export const updateArticle = async (req: Request, res: Response) => {
             });
           } else {
             // Create new content
-            console.log(`Creating new content for language: ${content.language}`);
             await prisma.articleContent.create({
               data: {
                 articleId: id,

@@ -24,9 +24,6 @@ api.interceptors.request.use(
       const token = localStorage.getItem('accessToken');
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
-        console.log('Adding auth token to request:', config.url);
-      } else {
-        console.log('No auth token found for request:', config.url);
       }
     }
     return config;
@@ -92,9 +89,6 @@ export async function apiRequest<T = any>(
     // Log request info without the full payload for large requests
     if (data) {
       const dataSize = JSON.stringify(data).length;
-      console.log(`API ${method} request to ${url} with data size: ${(dataSize / 1024).toFixed(2)} KB`);
-    } else {
-      console.log(`API ${method} request to ${url} without data`);
     }
     
     const response = await api({
@@ -104,7 +98,6 @@ export async function apiRequest<T = any>(
       ...config,
     });
     
-    console.log(`API ${method} response from ${url}:`, response.status);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

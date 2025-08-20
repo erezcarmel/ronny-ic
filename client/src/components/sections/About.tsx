@@ -75,7 +75,6 @@ export default function About({
   const sectionTitle = sectionData?.contents?.[0]?.title || title || t('title');
   const sectionImage = sectionData?.contents?.[0]?.imageUrl || imageUrl || '/images/logo.png';
   
-  console.log(isRtl);
   return (
     <section id="about" className="section bg-gray-50 dark:bg-gray-900">
       <div className="container-custom">

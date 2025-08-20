@@ -9,6 +9,4 @@ bcrypt.hash(password, saltRounds, function(err, hash) {
     console.error('Error generating hash:', err);
     return;
   }
-  console.log('Password hash for', password + ':', hash);
-  console.log('\nUse this hash in your SQL script.');
 });
