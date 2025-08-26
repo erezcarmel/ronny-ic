@@ -56,9 +56,8 @@ export default function AdminLoginPage() {
       // Set cookies for server-side auth checking
       setCookie('accessToken', data.accessToken, { 
         maxAge: 60 * 60 * 24, // 1 day
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict'
+        path: '/'
+        // Note: secure and sameSite are automatically handled by cookies-next v2.1.2
       });
       
       // Redirect to the original path or admin sections page

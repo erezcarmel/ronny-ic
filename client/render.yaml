@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: ronnyic-client
+    env: node
+    buildCommand: npm install --legacy-peer-deps && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        sync: false # This will be set manually in the Render dashboard
