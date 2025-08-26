@@ -59,8 +59,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   // Clear cookies
                   deleteCookie('accessToken');
                   
-                  // Redirect to login
-                  window.location.href = `/admin/login`;
+                  // Redirect to login using current origin
+                  window.location.href = `${window.location.origin}/admin/login`;
                 }
               }}
             >

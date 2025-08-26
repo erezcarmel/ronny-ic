@@ -9,3 +9,5 @@ services:
         value: production
       - key: NEXT_PUBLIC_API_URL
         sync: false # This will be set manually in the Render dashboard
+      - key: NEXT_PUBLIC_BASE_URL
+        sync: false # This will be set to the deployed URL
