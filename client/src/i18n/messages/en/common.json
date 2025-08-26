@@ -8,45 +8,15 @@
     "title": "Ronny Iss-Carmel",
     "subtitle": "Thoughts and Feelings Psychotherapy"
   },
-  "hero": {
-    "title": "Ronny Iss-Carmel",
-    "subtitle": "Psychological associate for children, adolescents, young adults and parents",
-    "contactMe": "Contact Me"
-  },
   "about": {
-    "title": "About Me",
-    "content": "I am a licensed psychologist specializing in children, adolescents, young adults, and parents. With over 15 years of experience, I provide personalized psychological services tailored to each individual's unique needs. My approach combines evidence-based techniques with compassionate care to help clients navigate life's challenges and achieve emotional well-being."
+    "title": "About Me"
   },
   "services": {
     "title": "Services",
     "noServices": "No services have been added yet. Please check back later.",
     "noCards": "No cards available for this service.",
     "showLess": "Show Less",
-    "readMore": "Read More",
-    "sections": {
-      "therapy": {
-        "name": "Adolescents, young adults, children and parents",
-        "title": "I treat anxiety and mood problems, emotional regulation, learning and attention, behavior, social integration, eating disorders, questions of self-image, identity formation and interpersonal relationships, life crises, and parent-child relationships. My approach is present and involved, focused on creating contact, connecting to the strengths and parts that function well in each person, and gradually touching the more painful or turbulent places. After the initial introductory phase, it is important for me to set clear goals for treatment with you, and work towards achieving them. I also incorporate cognitive and behavioral tools (from CBT, IPT or ACT) as needed, as part of a broad and dynamic view of who you are. As an educational psychologist, I understand well the important impact of kindergarten and school, including the social and educational situation and the child's relationship with educational figures, on his mental health. Therefore, as needed, I am in contact with elements in the system or attend school meetings, and participate in the development of comprehensive intervention programs.",
-        "content1-title": "Treatment of young adults",
-        "content1-text": "I am here for you, to unpack, to put your thoughts, feelings and aspirations for the future in order, to understand what is not working for you and what you would like to change, and to strengthen what is already working well. You can engage in work, studies, relationships, friends, family, difficult events, daily annoyances... Together we can define who you want to be and how you want to live to get there, practice how to treat yourself more beautifully, with compassion and understanding, and invest in yourself (self-care), how to communicate more effectively with others, and/or try additional ways of coping in a variety of situations.",
-        "content2-title": "Adolescent care",
-        "content2-text": "Let's meet. It can be through talking, through silence, sometimes even through play. I'm there with you, so that you won't be alone with all the tension, emotional flooding, loneliness, doubts and questions. True, sometimes it's completely enough to talk to a good friend or your mother, or simply manage on your own. But there are times when you need contact with someone from the outside, who brings both professional knowledge and experience as well as caring, understanding and a willingness to listen. Someone who won't immediately panic, get angry, or scold. So that you can share even the difficult or painful things, discover what you need to do something different this time, and to feel better about yourself and those around you. Yes, sometimes I dig a little, but when asked, I stop. No, I don't give the contents of the meeting to the parents, but I summarize the rules of privacy and confidentiality together in advance.",
-        "content3-title": "Play therapy for children",
-        "content3-text": "Play therapy for children is based on games and games in psychology and educational psychology. Games provide a way to relate to objects and situations effectively and quickly, and allow children to relate to objects and situations effectively and quickly. Games provide a way to relate to objects and situations effectively and quickly, and allow children to relate to objects and situations effectively and quickly.",
-        "content4-title": "Parent training and therapeutic work with parents",
-        "content4-text": "If you are concerned about your children's functioning, or your relationship with them, come for consultation, to seek support, and to think together. Perhaps even to go through a process that will change you as parents and as people. My approach combines a practical approach to dealing with your children's unwanted behaviors, along with a desire for a deeper understanding of their inner motivations and needs, an understanding of each parent's relationship with each child, and, if necessary, also consideration of aspects of the parent's history and personality, and family dynamics."
-      },
-      "diagnostics": {
-        "name": "Diagnostics",
-        "title": "My goal in every assessment is to get to know the child in a way that will allow me to formulate his/her story and explain what is happening to him/her, and thus benefit him/her, his/her parents, and his/her teachers. Let's find out together whether a diagnosis is even necessary, and if so, what diagnosis will provide an appropriate response.",
-        "content1-title": "Psychodidactic diagnosis",
-        "content1-text": "A diagnosis conducted starting at the end of second grade, and allows for the assessment of the areas of ability and thinking, language, memory and attention, reading skills, reading comprehension and writing, and, if necessary, also mastery of arithmetic and English, and emotional coping style. This diagnosis makes it possible to determine the causes of learning difficulties, whether they are learning disabilities or other difficulties, to describe the conditions under which the child learns optimally, and to provide targeted recommendations for assistance at school, in learning styles, and in assessment methods (including adjustments).",
-        "content2-title": "Psychological or extended psychodiagnostic assessment",
-        "content2-text": "A diagnosis that assesses areas of ability, perception and thinking, emotional state, self-image and coping methods, and allows for answers to questions regarding diagnosis and in-depth investigation.",
-        "content3-title": "Attention diagnosis, including a computerized attention test (MOXO)",
-        "content3-text": "This diagnosis allows for the assessment of areas of ability, perception and thinking, emotional state, self-image and coping methods, and allows for answers to questions regarding diagnosis and in-depth clarification."
-      }
-    }
+    "readMore": "Read More"
   },
   "articles": {
     "title": "Articles",

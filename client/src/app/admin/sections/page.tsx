@@ -5,7 +5,10 @@ import { useLocale } from '@/i18n/LocaleProvider';
 import { getMessages } from '@/i18n/config';
 import AboutForm from '@/components/admin/AboutForm';
 import ServicesForm from '@/components/admin/ServicesForm';
+import HeroForm from '@/components/admin/HeroForm';
+import HeaderForm from '@/components/admin/HeaderForm';
 import apiService from '@/lib/utils/api';
+import useAuthProtection from '@/lib/hooks/useAuthProtection';
 
 // Define section types
 interface Section {
@@ -19,16 +22,18 @@ interface Section {
 
 export default function SectionsPage() {
   const { locale } = useLocale();
+  const { isAuthenticated, isLoading: authLoading } = useAuthProtection();
   const [translations, setTranslations] = useState<any>(null);
   const [sections, setSections] = useState<Section[]>([
-    { id: '1', name: 'Hero Section', type: 'hero', orderIndex: 1, published: true },
-    { id: '2', name: 'About Section', type: 'about', orderIndex: 2, published: true },
-    { id: '3', name: 'Services Section', type: 'services', orderIndex: 3, published: true }
+    { id: '1', name: 'Header', type: 'header', orderIndex: 0, published: true },
+    { id: '2', name: 'Hero Section', type: 'hero', orderIndex: 1, published: true },
+    { id: '3', name: 'About Section', type: 'about', orderIndex: 2, published: true },
+    { id: '4', name: 'Services Section', type: 'services', orderIndex: 3, published: true }
   ]);
   
   // State for modal management
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<'about' | 'services' | 'hero' | null>(null);
+  const [modalType, setModalType] = useState<'about' | 'services' | 'hero' | 'header' | null>(null);
   const [currentSection, setCurrentSection] = useState<Section | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [sectionToDelete, setSectionToDelete] = useState<Section | null>(null);
@@ -58,11 +63,9 @@ export default function SectionsPage() {
       .finally(() => setIsLoading(false));
   }, [locale]);
   
+  // This function is no longer used - we're using the dropdown buttons instead
   const handleAddSection = () => {
-    // For simplicity, we'll just open the About form for now
-    setCurrentSection(null);
-    setModalType('about');
-    setIsModalOpen(true);
+    document.getElementById('sectionDropdown')?.classList.toggle('hidden');
   };
   
   const handleEditSection = async (section: Section) => {
@@ -116,8 +119,15 @@ export default function SectionsPage() {
       
       if (currentSection) {
         // Update existing section
+        let sectionName = currentSection.name;
+        
+        // Ensure header sections always have the correct name
+        if (currentSection.type === 'header' && sectionName !== 'Header') {
+          sectionName = 'Header';
+        }
+        
         apiData = {
-          name: currentSection.name,
+          name: sectionName,
           type: currentSection.type,
           orderIndex: currentSection.orderIndex,
           isPublished: formData.published,
@@ -132,6 +142,40 @@ export default function SectionsPage() {
           } else {
             console.warn('No contents found in form data for services!');
           }
+        } else if (currentSection.type === 'hero') {
+          // For hero section, use the hero-specific format
+          apiData.contents = formData.contents || [
+            {
+              language: 'en',
+              title: formData.titleEn || 'Hero Title',
+              subtitle: formData.subtitleEn || 'Hero Subtitle',
+              content: formData.buttonTextEn || 'Contact Me',
+              imageUrl: formData.imageUrl
+            },
+            {
+              language: 'he',
+              title: formData.titleHe || 'כותרת ראשית',
+              subtitle: formData.subtitleHe || 'כותרת משנה',
+              content: formData.buttonTextHe || 'צור קשר',
+              imageUrl: formData.imageUrl
+            }
+          ];
+        } else if (currentSection.type === 'header') {
+          // For header section
+          apiData.contents = formData.contents || [
+            {
+              language: 'en',
+              title: formData.titleEn || 'Ronny Iss-Carmel',
+              subtitle: formData.subtitleEn || 'Thoughts and Feelings Psychotherapy',
+              imageUrl: formData.imageUrl
+            },
+            {
+              language: 'he',
+              title: formData.titleHe || 'רוני איס-כרמל',
+              subtitle: formData.subtitleHe || 'פסיכותרפיה מחשבות ורגשות',
+              imageUrl: formData.imageUrl
+            }
+          ];
         } else {
           // For other section types, use the old format
           apiData.contents = [
@@ -163,8 +207,14 @@ export default function SectionsPage() {
         ));
       } else {
         // Create new section
+        let sectionName = 'New Section';
+        if (modalType === 'about') sectionName = 'About Section';
+        if (modalType === 'hero') sectionName = 'Hero Section';
+        if (modalType === 'services') sectionName = 'Services Section';
+        if (modalType === 'header') sectionName = 'Header';
+        
         apiData = {
-          name: modalType === 'about' ? 'About Section' : 'New Section',
+          name: sectionName,
           type: modalType || 'about',
           orderIndex: sections.length + 1,
           isPublished: formData.published,
@@ -179,6 +229,40 @@ export default function SectionsPage() {
           } else {
             console.warn('No contents found in form data for services!');
           }
+        } else if (modalType === 'hero') {
+          // For hero section, use the hero-specific format
+          apiData.contents = formData.contents || [
+            {
+              language: 'en',
+              title: formData.titleEn || 'Hero Title',
+              subtitle: formData.subtitleEn || 'Hero Subtitle',
+              content: formData.buttonTextEn || 'Contact Me',
+              imageUrl: formData.imageUrl
+            },
+            {
+              language: 'he',
+              title: formData.titleHe || 'כותרת ראשית',
+              subtitle: formData.subtitleHe || 'כותרת משנה',
+              content: formData.buttonTextHe || 'צור קשר',
+              imageUrl: formData.imageUrl
+            }
+          ];
+        } else if (modalType === 'header') {
+          // For header section
+          apiData.contents = formData.contents || [
+            {
+              language: 'en',
+              title: formData.titleEn || 'Ronny Iss-Carmel',
+              subtitle: formData.subtitleEn || 'Thoughts and Feelings Psychotherapy',
+              imageUrl: formData.imageUrl
+            },
+            {
+              language: 'he',
+              title: formData.titleHe || 'רוני איס-כרמל',
+              subtitle: formData.subtitleHe || 'פסיכותרפיה מחשבות ורגשות',
+              imageUrl: formData.imageUrl
+            }
+          ];
         } else {
           // For other section types, use the old format
           apiData.contents = [
@@ -226,11 +310,8 @@ export default function SectionsPage() {
     setCurrentSection(null);
   };
   
-  if (!translations) {
-    return <div>Loading...</div>;
-  }
-  
-  if (isLoading) {
+  // Show loading state while checking auth or loading translations
+  if (authLoading || !translations || isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
@@ -238,19 +319,77 @@ export default function SectionsPage() {
     );
   }
   
+  // If not authenticated, the useAuthProtection hook will redirect to login
+  
   return (
     <>
       <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
         {translations.title}
       </h1>
       
-      <div className="mb-6">
-        <button 
-          onClick={handleAddSection}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
-        >
-          {translations.add}
-        </button>
+      <div className="mb-6 flex space-x-3">
+        <div className="dropdown relative">
+          <button 
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
+            onClick={() => {
+              const dropdown = document.getElementById('sectionDropdown');
+              if (dropdown) {
+                dropdown.classList.toggle('hidden');
+              }
+            }}
+          >
+            {translations.add} <span className="ml-1">▼</span>
+          </button>
+          <div 
+            id="sectionDropdown" 
+            className="hidden absolute z-10 mt-1 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1"
+          >
+                          <button 
+              onClick={() => {
+                document.getElementById('sectionDropdown')?.classList.add('hidden');
+                setCurrentSection(null);
+                setModalType('header');
+                setIsModalOpen(true);
+              }}
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              Header
+            </button>
+            <button 
+              onClick={() => {
+                document.getElementById('sectionDropdown')?.classList.add('hidden');
+                setCurrentSection(null);
+                setModalType('hero');
+                setIsModalOpen(true);
+              }}
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              Hero Section
+            </button>
+            <button 
+              onClick={() => {
+                document.getElementById('sectionDropdown')?.classList.add('hidden');
+                setCurrentSection(null);
+                setModalType('about');
+                setIsModalOpen(true);
+              }}
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              About Section
+            </button>
+            <button 
+              onClick={() => {
+                document.getElementById('sectionDropdown')?.classList.add('hidden');
+                setCurrentSection(null);
+                setModalType('services');
+                setIsModalOpen(true);
+              }}
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              Services Section
+            </button>
+          </div>
+        </div>
       </div>
       
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
@@ -334,19 +473,19 @@ export default function SectionsPage() {
                   onCancel={handleFormCancel} 
                 />
               )}
+              {modalType === 'header' && (
+                <HeaderForm 
+                  initialData={currentSection?.content} 
+                  onSubmit={handleFormSubmit} 
+                  onCancel={handleFormCancel} 
+                />
+              )}
               {modalType === 'hero' && (
-                <div>
-                  <h2 className="text-xl font-semibold mb-6">Edit Hero Section</h2>
-                  <p>Hero section editor not implemented yet.</p>
-                  <div className="flex justify-end mt-6">
-                    <button 
-                      onClick={handleFormCancel}
-                      className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md"
-                    >
-                      {translations.cancel}
-                    </button>
-                  </div>
-                </div>
+                <HeroForm 
+                  initialData={currentSection?.content} 
+                  onSubmit={handleFormSubmit} 
+                  onCancel={handleFormCancel} 
+                />
               )}
             </div>
           </div>

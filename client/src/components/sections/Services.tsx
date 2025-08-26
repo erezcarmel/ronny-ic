@@ -245,7 +245,7 @@ export default function Services({
   });
   
   return (
-    <section id="services" className={`services-section bg-white dark:bg-gray-800 w-full max-w-full ${isRtl ? 'pb-0' : 'pb-8'}`}>
+    <section id="services" className={`services-section bg-white dark:bg-gray-800 w-full max-w-full pt-8 ${isRtl ? 'pb-0' : 'pb-8'}`}>
       <div className="w-full">
         {loading ? (
           <div className="flex justify-center items-center py-12">
@@ -264,6 +264,11 @@ export default function Services({
             transition={{ duration: 0.6 }}
             className={`${isRtl ? 'rtl' : 'ltr'}`}
           > 
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+                {t('title')}
+              </h2>
+            </div>
             <div>
               {content ? (
                 <div dangerouslySetInnerHTML={{ __html: content }} />

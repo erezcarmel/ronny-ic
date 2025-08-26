@@ -36,15 +36,15 @@ export default function AboutForm({ initialData, onSubmit, onCancel }: AboutForm
   
   // Extract image URL from initialData if it exists
   const getInitialImageUrl = () => {
-    if (!initialData) return '/images/logo.png';
+    if (!initialData) return '';
     
     // Check if we have contents array (from API)
     if (initialData.contents && Array.isArray(initialData.contents) && initialData.contents.length > 0) {
-      return initialData.contents[0].imageUrl || '/images/logo.png';
+      return initialData.contents[0].imageUrl;
     }
     
     // Fallback to direct property
-    return initialData.imageUrl || '/images/logo.png';
+    return initialData.imageUrl;
   };
   
   const [formData, setFormData] = useState({

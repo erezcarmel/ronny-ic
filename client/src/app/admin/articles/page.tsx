@@ -5,6 +5,7 @@ import { useLocale } from '@/i18n/LocaleProvider';
 import { getMessages } from '@/i18n/config';
 import apiService from '@/lib/utils/api';
 import ArticleForm from '@/components/admin/ArticleForm';
+import useAuthProtection from '@/lib/hooks/useAuthProtection';
 
 interface Article {
   id: string;
@@ -24,6 +25,7 @@ interface Article {
 
 export default function ArticlesPage() {
   const { locale } = useLocale();
+  const { isAuthenticated, isLoading: authLoading } = useAuthProtection();
   const [translations, setTranslations] = useState<any>(null);
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -112,9 +114,16 @@ export default function ArticlesPage() {
     setEditingArticleId(null);
   };
   
-  if (!translations) {
-    return <div>Loading...</div>;
+  // Show loading state while checking auth or loading translations
+  if (authLoading || !translations) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+      </div>
+    );
   }
+  
+  // If not authenticated, the useAuthProtection hook will redirect to login
   
   return (
     <>

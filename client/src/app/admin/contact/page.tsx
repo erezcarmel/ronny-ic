@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { getMessages } from '@/i18n/config';
 import apiService from '@/lib/utils/api';
+import useAuthProtection from '@/lib/hooks/useAuthProtection';
 
 interface ContactInfoData {
   id?: string;
@@ -17,6 +18,7 @@ interface ContactInfoData {
 
 export default function ContactPage() {
   const { locale } = useLocale();
+  const { isAuthenticated, isLoading: authLoading } = useAuthProtection();
   const [contactTranslations, setContactTranslations] = useState<any>(null);
   const [adminTranslations, setAdminTranslations] = useState<any>(null);
   const [commonTranslations, setCommonTranslations] = useState<any>(null);
@@ -114,9 +116,16 @@ export default function ContactPage() {
     }
   };
   
-  if (!contactTranslations || !adminTranslations || !commonTranslations) {
-    return <div className="flex justify-center items-center h-64">Loading...</div>;
+  // Show loading state while checking auth or loading translations
+  if (authLoading || !contactTranslations || !adminTranslations || !commonTranslations) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+      </div>
+    );
   }
+  
+  // If not authenticated, the useAuthProtection hook will redirect to login
   
   if (isLoading) {
     return (

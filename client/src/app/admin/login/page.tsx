@@ -1,15 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { getMessages } from '@/i18n/config';
+import { setCookie } from 'cookies-next';
 
 export default function AdminLoginPage() {
   const { locale } = useLocale();
   const [translations, setTranslations] = useState<any>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectPath = searchParams.get('redirect') || '/admin/sections';
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -45,13 +48,21 @@ export default function AdminLoginPage() {
         throw new Error(data.message || 'Login failed');
       }
       
-      // Store tokens in localStorage
+      // Store tokens in localStorage and cookies
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
       localStorage.setItem('user', JSON.stringify(data.user));
       
-      // Redirect to admin dashboard
-      router.push('/admin');
+      // Set cookies for server-side auth checking
+      setCookie('accessToken', data.accessToken, { 
+        maxAge: 60 * 60 * 24, // 1 day
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict'
+      });
+      
+      // Redirect to the original path or admin sections page
+      router.push(redirectPath);
     } catch (err: any) {
       setError(err.message || translations.error);
     } finally {

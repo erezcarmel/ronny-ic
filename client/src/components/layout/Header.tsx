@@ -9,19 +9,80 @@ import LanguageSwitcher from './LanguageSwitcher';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { getMessages } from '@/i18n/config';
 import { isSectionVisible } from '@/i18n/config/sections';
+import apiService from '@/lib/utils/api';
+
+interface HeaderContent {
+  title: string;
+  subtitle: string;
+  imageUrl?: string;
+}
 
 export default function Header() {
   const { locale } = useLocale();
   const [translations, setTranslations] = useState<any>(null);
+  const [headerData, setHeaderData] = useState<HeaderContent | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const pathname = usePathname();
   
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   useEffect(() => {
-    getMessages(locale).then(messages => {
-      setTranslations(messages.navigation);
-    });
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Fetch translations as fallback
+        const messages = await getMessages(locale);
+        setTranslations(messages.navigation);
+        
+        // Fetch header section from API
+        try {
+          // First try to get section by ID if we have it cached
+          let headerSection;
+          const cachedHeaderId = localStorage.getItem('headerSectionId');
+          
+          if (cachedHeaderId) {
+            try {
+              // Use getById which returns all languages
+              headerSection = await apiService.sections.getById(cachedHeaderId, locale);
+            } catch (e) {
+              console.error('Failed to fetch by ID, falling back to type', e);
+            }
+          }
+          
+          // Fallback to getByType
+          if (!headerSection) {
+            headerSection = await apiService.sections.getByType('header', locale);
+            // Cache the ID for future use
+            if (headerSection && headerSection.id) {
+              localStorage.setItem('headerSectionId', headerSection.id);
+            }
+          }
+          
+          if (headerSection && headerSection.contents && headerSection.contents.length > 0) {
+            // Find content that matches the current language
+            const content = headerSection.contents.find((c: any) => c.language === locale) || headerSection.contents[0];
+            
+            if (content) {
+              setHeaderData({
+                title: content.title || messages.navigation.title,
+                subtitle: content.subtitle || messages.navigation.subtitle,
+                imageUrl: content.imageUrl
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching header section:', error);
+        }
+      } catch (error) {
+        console.error('Error in header component:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
     
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -57,7 +118,7 @@ export default function Header() {
           {/* Logo */}
           <div className="flex items-center">
             <Image 
-              src="/images/logo.png" 
+              src={headerData?.imageUrl || "/images/logo.png"} 
               alt="Ronny Iss-Carmel Logo" 
               width={50} 
               height={50} 
@@ -65,10 +126,10 @@ export default function Header() {
             />
             <div className="flex flex-col gap-0">
               <span className="font-varela text-xl md:text-2xl font-bold text-gray-600">
-                {translations.title}
+                {headerData?.title || translations.title}
               </span>
               <span className="font-varela md:text-sm font-bold text-gray-600 hidden sm:block">
-                {translations.subtitle}
+                {headerData?.subtitle || translations.subtitle}
               </span>
             </div>
           </div>

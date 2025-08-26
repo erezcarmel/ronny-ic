@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { getMessages } from '@/i18n/config';
 import LanguageSwitcher from './LanguageSwitcher';
+import { deleteCookie } from 'cookies-next';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -50,9 +51,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               onClick={() => {
                 // Handle logout
                 if (typeof window !== 'undefined') {
+                  // Clear localStorage
                   localStorage.removeItem('accessToken');
                   localStorage.removeItem('refreshToken');
                   localStorage.removeItem('user');
+                  
+                  // Clear cookies
+                  deleteCookie('accessToken');
+                  
+                  // Redirect to login
                   window.location.href = `/admin/login`;
                 }
               }}
@@ -70,14 +77,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <aside className="md:col-span-1">
             <nav className="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
               <ul className="space-y-2">
-                <li>
-                  <Link 
-                    href="/admin"
-                    className="block px-4 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    {dashboardTranslations.dashboard}
-                  </Link>
-                </li>
                 <li>
                   <Link 
                     href="/admin/sections"
