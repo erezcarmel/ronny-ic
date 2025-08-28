@@ -116,13 +116,12 @@ export default function Header() {
       <div className="container-custom">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center">
+          <div className="flex items-center gap-4">
             <Image 
               src={headerData?.imageUrl || "/images/logo.png"} 
               alt="Ronny Iss-Carmel Logo" 
               width={50} 
-              height={50} 
-              className="mr-3"
+              height={50}
             />
             <div className="flex flex-col gap-0">
               <span className="font-varela text-xl md:text-2xl font-bold text-gray-600">

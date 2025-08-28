@@ -2,7 +2,17 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['localhost'],
+    domains: ['localhost', 'ronny-ic-server.onrender.com', 'ronny-ic.onrender.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      }
+    ],
   },
   async rewrites() {
     return [

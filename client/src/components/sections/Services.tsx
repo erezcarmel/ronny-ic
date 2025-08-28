@@ -264,11 +264,6 @@ export default function Services({
             transition={{ duration: 0.6 }}
             className={`${isRtl ? 'rtl' : 'ltr'}`}
           > 
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
-                {t('title')}
-              </h2>
-            </div>
             <div>
               {content ? (
                 <div dangerouslySetInnerHTML={{ __html: content }} />
@@ -310,14 +305,14 @@ export default function Services({
                         
                         {section.cards && section.cards.length > 0 && (
                           <div 
-                            className={`flex flex-nowrap md:flex-wrap overflow-x-auto md:overflow-visible pb-6 gap-6 snap-x snap-mandatory md:snap-none scrollbar-hide scroll-smooth -mx-4 sm:-mx-6 md:mx-0 px-8 sm:px-10 md:px-16 lg:px-24 xl:px-32 w-full transition-all duration-500 ease-in-out ${
+                            className={`flex flex-nowrap justify-center md:flex-wrap overflow-x-auto md:overflow-visible pb-6 gap-6 snap-x snap-mandatory md:snap-none scrollbar-hide scroll-smooth -mx-4 sm:-mx-6 md:mx-0 px-8 sm:px-10 md:px-16 lg:px-24 xl:px-32 w-full transition-all duration-500 ease-in-out ${
                               expandedSections[section.id] 
                                 ? 'max-h-[2000px] opacity-100 mt-8' 
                                 : 'max-h-0 opacity-0 overflow-hidden'
                             }`}
                           >
                             {section.cards.map((card) => (
-                              <div key={card.id} className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:shadow-xl hover:-translate-y-1 flex-shrink-0 min-w-[280px] w-[280px] sm:min-w-[320px] sm:w-[320px] md:w-[calc(50%-12px)] md:min-w-[calc(50%-12px)] lg:w-[calc(25%-18px)] lg:min-w-[calc(25%-18px)] snap-start">
+                              <div key={card.id} className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg border border-gray-100 transition-transform duration-300 hover:shadow-xl hover:-translate-y-1 flex-shrink-0 min-w-[280px] w-[280px] sm:min-w-[320px] sm:w-[320px] md:w-[calc(50%-12px)] md:min-w-[calc(50%-12px)] lg:w-[calc(25%-18px)] lg:min-w-[calc(25%-18px)] snap-start">
                                 {card.imageUrl && card.imageUrl.trim() !== '' && (
                                   <div className="h-48 overflow-hidden">
                                     <Image

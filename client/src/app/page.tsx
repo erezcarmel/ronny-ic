@@ -31,12 +31,13 @@ export default function Home() {
     <MainLayout>
       {/* Hero Section */}
       <Hero />
-      
+
+      {/* Services Section */}
+      <Services />
+
       {/* About Section */}
       <About />
       
-      {/* Services Section */}
-      <Services />
       
       {/* Articles Section - conditionally rendered based on locale */}
       {isSectionVisible('articles', locale) && <Articles />}

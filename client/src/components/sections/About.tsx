@@ -68,11 +68,21 @@ export default function About({ title, content, imageUrl }: AboutProps) {
 
   // Get content from section data or fallback to props
   const sectionContent = sectionData?.contents?.[0]?.content || content;
-  const sectionTitle = sectionData?.contents?.[0]?.title || title || t("title");
   const sectionImage = sectionData?.contents?.[0]?.imageUrl || imageUrl;
+  
+  // Process image URL to ensure it works correctly in all environments
+  // Use local image from public folder as fallback
+  const localImagePath = '/images/ronny.jpg';
+  
+  const processedImageUrl = sectionImage ? 
+    sectionImage.startsWith('blob:') ? 
+      // For blob URLs, use local image instead
+      localImagePath : 
+      sectionImage : 
+    localImagePath;
 
   return (
-    <section id="about" className="section bg-gray-50 dark:bg-gray-900">
+    <section id="about" className="about-section bg-gray-50 dark:bg-gray-900">
       <div className="container-custom">
         {loading ? (
           <div className="flex justify-center items-center py-12">
@@ -87,33 +97,27 @@ export default function About({ title, content, imageUrl }: AboutProps) {
             transition={{ duration: 0.6 }}
             className={`${isRtl ? "rtl" : "ltr"}`}
           >
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
-                {sectionTitle}
-              </h2>
-            </div>
-
-            <div className="flex flex-col md:flex-row gap-8 items-center">
-              <div className={`${isRtl ? "order-2" : "order-1"}`}>
-                <div className="prose dark:prose-invert max-w-none">
+            <div className="flex flex-col md:flex-row gap-8 items-stretch min-h-[400px]">
+              <div className={`${isRtl ? "order-2" : "order-1"} flex-1`}>
+                <div className="prose dark:prose-invert max-w-none h-full">
                   {sectionContent && (
                     <div dangerouslySetInnerHTML={{ __html: sectionContent }} />
                   )}
                 </div>
               </div>
 
-              {sectionImage && (
-                <div className="rounded-lg overflow-hidden shadow-lg">
-                  <Image
-                    src={sectionImage}
-                    alt={sectionTitle}
-                    width={200}
-                    height={200}
-                    className="w-full h-auto object-cover max-h-[200px]"
-                    priority
-                  />
-                </div>
-              )}
+              <div className={`rounded-lg overflow-hidden shadow-lg h-full max-w-[300px] flex items-center justify-center align-middle mt-6 my-0 mx-auto ${isRtl ? "order-1" : "order-2"}`}>
+                <Image
+                  src={processedImageUrl}
+                  alt="About me"
+                  width={300}
+                  height={400}
+                  className="w-full h-full object-cover md:min-h-[440px]"
+                  priority
+                  unoptimized={!processedImageUrl.startsWith('/')} // Only optimize local images
+                  style={{ maxWidth: '300px', height: '100%' }}
+                />
+              </div>
             </div>
           </motion.div>
         )}

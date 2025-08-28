@@ -74,7 +74,7 @@ export default function Hero({ title, subtitle }: HeroProps) {
   }, [locale]);
   
   if (isLoading || (!heroData && !translations)) {
-    return <div className="min-h-[70vh] flex items-center justify-center">Loading...</div>;
+    return <div className="min-h-[60vh] flex items-center justify-center">Loading...</div>;
   }
   
   // Set background image if provided in heroData
@@ -84,13 +84,13 @@ export default function Hero({ title, subtitle }: HeroProps) {
 
   return (
     <section 
-      className="min-h-[70vh] flex items-center justify-center bg-cover bg-center bg-header-bg relative" 
+      className="min-h-[60vh] flex items-center justify-center bg-cover bg-center bg-header-bg relative" 
       style={backgroundStyle}
     >
       {/* Semi-transparent overlay */}
       <div className="absolute inset-0 bg-gray-50 opacity-70"></div>
       
-      <div className="container-custom relative z-10">
+      <div className="container-custom relative z-10 pt-12">
         <div className={`text-center ${isRtl ? 'rtl' : 'ltr'}`}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -118,7 +118,7 @@ export default function Hero({ title, subtitle }: HeroProps) {
             >
               <a
                 href="#contact"
-                className="btn btn-outline text-lg px-8 py-3 hover:bg-transparent hover:border-[#555599]"
+                className="btn btn-outline text-lg px-8 py-3 shadow-lg hover:bg-[#ffffff66] hover:border-[#ffffff66]"
                 aria-label="Contact me"
               >
                 {heroData ? heroData.content : (translations.contactMe || "Contact Me")}
