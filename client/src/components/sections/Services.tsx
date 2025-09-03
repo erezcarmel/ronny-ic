@@ -25,6 +25,7 @@ interface ServiceSection {
   title: string;
   description: string;
   cards: ServiceCard[];
+  imageUrl?: string;
 }
 
 interface SectionContent {
@@ -77,9 +78,26 @@ export default function Services({
         setSectionData(data);
         
         if (data && data.id) {
+          // Initialize all sections to be collapsed by default
+          const initialExpandedState: {[key: string]: boolean} = { [data.id]: false };
+          
+          // If there are service sections, set them all to collapsed
+          if (data.contents?.[0]?.content) {
+            try {
+              const parsedContent = JSON.parse(data.contents[0].content);
+              if (parsedContent?.services && Array.isArray(parsedContent.services)) {
+                parsedContent.services.forEach((service: any, index: number) => {
+                  initialExpandedState[`service-${data.id}-${index}`] = false;
+                });
+              }
+            } catch (e) {
+              console.error('Error parsing services for expanded state:', e);
+            }
+          }
+          
           setExpandedSections(prev => ({
             ...prev,
-            [data.id]: true
+            ...initialExpandedState
           }));
         }
         
@@ -132,7 +150,8 @@ export default function Services({
               id: `service-${sectionData.id}-${index}`,
               title: service.title,
               description: service.description,
-              cards: service.cards || []
+              cards: service.cards || [],
+              imageUrl: service.imageUrl || sectionData.contents[0]?.imageUrl
             }));
           }
           
@@ -142,7 +161,8 @@ export default function Services({
               id: sectionData.id,
               title: parsedContent.title,
               description: parsedContent.description,
-              cards: parsedContent.cards
+              cards: parsedContent.cards,
+              imageUrl: parsedContent.imageUrl || sectionData.contents[0]?.imageUrl
             }];
           }
         }
@@ -218,7 +238,8 @@ export default function Services({
               id: section.id,
               title: section.title,
               description: description,
-              cards: cards
+              cards: cards,
+              imageUrl: section.imageUrl || sectionData.contents[0]?.imageUrl
             };
             return result;
           });
@@ -245,7 +266,7 @@ export default function Services({
   });
   
   return (
-    <section id="services" className={`services-section bg-white dark:bg-gray-800 w-full max-w-full pt-8 ${isRtl ? 'pb-0' : 'pb-8'}`}>
+    <section id="services" className={`services-section w-full max-w-full pt-8 ${isRtl ? 'pb-0' : 'pb-8'}`}>
       <div className="w-full">
         {loading ? (
           <div className="flex justify-center items-center py-12">
@@ -271,49 +292,66 @@ export default function Services({
                 <>
                   {serviceSections.length > 0 ? (
                     serviceSections.map((section) => (
-                      <div key={section.id}>
-                        <div className="w-full px-8 sm:px-10 md:px-16 lg:px-24 xl:px-32 pt-8">
-                          <h2 className={`text-center font-bold ${section.cards && section.cards.length > 0 ? 'text-3xl mb-4' : 'text-2xl mb-0'}`}>
-                            {section.title}
-                          </h2>
-                          { section.description && (
-                            <div className={`text-base text-center text-gray-700 dark:text-gray-300 mb-2 max-w-6xl mx-auto`}>
-                              <div dangerouslySetInnerHTML={{ __html: section.description }} />
-                            </div>
-                          )}
+                      <div key={section.id} className={`py-8 ${serviceSections.indexOf(section) % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                        <div className={`w-full flex flex-col md:flex-row gap-8 ${serviceSections.indexOf(section) % 2 !== 0 ? 'md:flex-row-reverse' : 'md:flex-row'}`}>
+                          {/* Image Column - Full height */}
+                          <div className="md:w-1/3 flex justify-center">
+                            {section.imageUrl ? (
+                              <div className="relative w-full h-full min-h-[300px] overflow-hidden rounded-lg shadow-lg">
+                                <Image
+                                  src={section.imageUrl}
+                                  alt={section.title}
+                                  width={500}
+                                  height={800}
+                                  className="w-full h-full object-cover sticky top-24"
+                                  onError={handleImageError}
+                                />
+                              </div>
+                            ) : (
+                              <div className="relative w-full h-full min-h-[300px] bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center sticky top-24">
+                                <span className="text-gray-500 dark:text-gray-400">No image available</span>
+                              </div>
+                            )}
+                          </div>
                           
-                          {section.cards && section.cards.length > 0 && (
-                            <div className="flex justify-center">
-                              <button
-                                onClick={() => toggleSection(section.id)}
-                                className="flex gap-2 btn text-md text-gray-700 hover:text-[#555599] px-8 py-3 rounded-full transition-all duration-300 flex items-center space-x-2 hover:bg-transparent"
-                              >
-                                <span>{expandedSections[section.id] ? t('showLess') : t('readMore')}</span>
-                                <svg 
-                                  className={`w-5 h-5 transition-transform duration-300 ${expandedSections[section.id] ? 'rotate-180' : ''}`} 
-                                  fill="none" 
-                                  stroke="currentColor" 
-                                  viewBox="0 0 24 24" 
-                                  xmlns="http://www.w3.org/2000/svg"
+                          {/* Content Column - Title, Description, Cards */}
+                          <div className="md:w-2/3 px-8 sm:px-10 md:px-8 lg:px-12 xl:px-16">
+                            <h2 className={`font-bold ${section.cards && section.cards.length > 0 ? 'text-3xl mb-4' : 'text-2xl mb-0'}`}>
+                              {section.title}
+                            </h2>
+                            { section.description && (
+                              <div className={`text-base text-gray-700 dark:text-gray-300 mb-6 max-w-6xl`}>
+                                <div dangerouslySetInnerHTML={{ __html: section.description }} />
+                              </div>
+                            )}
+                            
+                            {section.cards && section.cards.length > 0 && (
+                              <div className="mb-4">
+                                <button
+                                  onClick={() => toggleSection(section.id)}
+                                  className="flex gap-2 text-md text-gray-700 hover:text-[#555599] px-0 py-2 rounded-full transition-all duration-300 flex items-center space-x-2 hover:bg-transparent"
                                 >
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                        
-                        {section.cards && section.cards.length > 0 && (
-                          <div 
-                            className={`flex flex-nowrap justify-center md:flex-wrap overflow-x-auto md:overflow-visible pb-6 gap-6 snap-x snap-mandatory md:snap-none scrollbar-hide scroll-smooth -mx-4 sm:-mx-6 md:mx-0 px-8 sm:px-10 md:px-16 lg:px-24 xl:px-32 w-full transition-all duration-500 ease-in-out ${
-                              expandedSections[section.id] 
-                                ? 'max-h-[2000px] opacity-100 mt-8' 
-                                : 'max-h-0 opacity-0 overflow-hidden'
-                            }`}
-                          >
+                                  <span>{expandedSections[section.id] ? t('showLess') : t('readMore')}</span>
+                                  <svg 
+                                    className={`w-5 h-5 transition-transform duration-300 ${expandedSections[section.id] ? 'rotate-180' : ''}`} 
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    viewBox="0 0 24 24" 
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                  </svg>
+                                </button>
+                              </div>
+                            )}
+                            
+                            {section.cards && section.cards.length > 0 && (
+                              <div 
+                                className={`flex flex-wrap justify-start overflow-visible gap-6 w-full transition-all duration-500 ease-in-out`}
+                              >
                             {section.cards.map((card) => (
-                              <div key={card.id} className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg border border-gray-100 transition-transform duration-300 hover:shadow-xl hover:-translate-y-1 flex-shrink-0 min-w-[280px] w-[280px] sm:min-w-[320px] sm:w-[320px] md:w-[calc(50%-12px)] md:min-w-[calc(50%-12px)] lg:w-[calc(25%-18px)] lg:min-w-[calc(25%-18px)] snap-start">
-                                {card.imageUrl && card.imageUrl.trim() !== '' && (
+                              <div key={card.id} className={`bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg border border-gray-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex-shrink-0 w-full md:w-[calc(50%-12px)] lg:w-[calc(50%-12px)] ${expandedSections[section.id] ? 'p-0' : 'p-4'}`}>
+                                {expandedSections[section.id] && card.imageUrl && card.imageUrl.trim() !== '' && (
                                   <div className="h-48 overflow-hidden">
                                     <Image
                                       src={card.imageUrl}
@@ -325,22 +363,26 @@ export default function Services({
                                     />
                                   </div>
                                 )}
-                                <div className="p-4">
-                                  <h3 className={`text-lg font-bold mb-3 ${isRtl ? 'text-right' : 'text-left'}`}>
+                                <div className={expandedSections[section.id] ? "p-4" : ""}>
+                                  <h3 className={`text-lg font-bold ${expandedSections[section.id] ? 'mb-3' : 'mb-0'} ${isRtl ? 'text-right' : 'text-left'}`}>
                                     {card.title}
                                   </h3>
-                                  <div className={`prose dark:prose-invert ${isRtl ? 'text-right' : 'text-left'}`}>
-                                    {typeof card.content === 'string' ? (
-                                      <div dangerouslySetInnerHTML={{ __html: card.content }} />
-                                    ) : (
-                                      <p>{card.content}</p>
-                                    )}
-                                  </div>
+                                  {expandedSections[section.id] && (
+                                    <div className={`prose dark:prose-invert ${isRtl ? 'text-right' : 'text-left'}`}>
+                                      {typeof card.content === 'string' ? (
+                                        <div dangerouslySetInnerHTML={{ __html: card.content }} />
+                                      ) : (
+                                        <p>{card.content}</p>
+                                      )}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             ))}
+                              </div>
+                            )}
                           </div>
-                        )}
+                        </div>
                       </div>
                     ))
                   ) : (

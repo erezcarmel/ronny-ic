@@ -82,7 +82,7 @@ export default function About({ title, content, imageUrl }: AboutProps) {
     localImagePath;
 
   return (
-    <section id="about" className="about-section bg-gray-50 dark:bg-gray-900">
+    <section id="about" className="about-section pb-8 bg-white dark:bg-gray-900">
       <div className="container-custom">
         {loading ? (
           <div className="flex justify-center items-center py-12">
