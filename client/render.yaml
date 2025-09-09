@@ -2,7 +2,8 @@ services:
   - type: web
     name: ronnyic-client
     env: node
-    buildCommand: npm install --legacy-peer-deps && npm run build
+    plan: starter # This plan has 512MB memory
+    buildCommand: npm install --legacy-peer-deps --no-optional && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
@@ -11,3 +12,15 @@ services:
         sync: false # This will be set manually in the Render dashboard
       - key: NEXT_PUBLIC_BASE_URL
         sync: false # This will be set to the deployed URL
+    # Configure Node.js settings
+    nodeVersion: 18.x
+    # Optimize build and runtime
+    disk:
+      name: node_modules
+      mountPath: /opt/render/project/node_modules
+      sizeGB: 1
+    healthCheckPath: /
+    # Autoscaling settings
+    autoscaling:
+      min: 1
+      max: 1

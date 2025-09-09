@@ -4,9 +4,10 @@ import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useLocale } from '@/i18n/LocaleProvider';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import apiService from '@/lib/utils/api';
+import { resolveImagePath } from '@/lib/utils/imageUtils';
 
 interface ServicesProps {
   title?: string;
@@ -98,90 +99,74 @@ export default function Services({
     visible: { opacity: 1, y: 0 },
   };
 
-  // Debounce function to limit API calls
-  const debounce = <T extends (...args: any[]) => any>(func: T, wait: number) => {
-    let timeout: NodeJS.Timeout | null = null;
-    return function executedFunction(...args: Parameters<T>) {
-      const later = () => {
-        if (timeout) clearTimeout(timeout);
-        func(...args);
-      };
-      if (timeout) clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-    };
-  };
-
-  // Fetch section data from API with debouncing
-  const fetchSectionData = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await apiService.sections.getByType('services', locale);
-      setSectionData(data);
-      
-      // Initialize with the first card of each section selected
-      if (data && data.contents && data.contents[0]?.content) {
-        try {
-          const parsedContent = JSON.parse(data.contents[0].content);
-          const initialExpandedState: {[key: string]: boolean} = {};
-          
-          // Handle different content formats
-          if (parsedContent && typeof parsedContent === 'object' && !Array.isArray(parsedContent)) {
-            if (parsedContent.services && Array.isArray(parsedContent.services)) {
-              // Multiple services format
-              parsedContent.services.forEach((service: any, sIndex: number) => {
-                if (service.cards && service.cards.length > 0) {
-                  const firstCardId = service.cards[0].id || `service-${data.id}-${sIndex}-item-0`;
+  // Fetch section data from API
+  useEffect(() => {
+    const fetchSectionData = async () => {
+      try {
+        setLoading(true);
+        const data = await apiService.sections.getByType('services', locale);
+        setSectionData(data);
+        
+        // Initialize with the first card of each section selected
+        if (data && data.contents && data.contents[0]?.content) {
+          try {
+            const parsedContent = JSON.parse(data.contents[0].content);
+            const initialExpandedState: {[key: string]: boolean} = {};
+            
+            // Handle different content formats
+            if (parsedContent && typeof parsedContent === 'object' && !Array.isArray(parsedContent)) {
+              if (parsedContent.services && Array.isArray(parsedContent.services)) {
+                // Multiple services format
+                parsedContent.services.forEach((service: any, sIndex: number) => {
+                  if (service.cards && service.cards.length > 0) {
+                    const firstCardId = service.cards[0].id || `service-${data.id}-${sIndex}-item-0`;
+                    initialExpandedState[firstCardId] = true;
+                  }
+                });
+              } else if (parsedContent.cards && parsedContent.cards.length > 0) {
+                // Single service format
+                const firstCardId = parsedContent.cards[0].id || `${data.id}-item-0`;
+                initialExpandedState[firstCardId] = true;
+              }
+            } else if (Array.isArray(parsedContent) && parsedContent.length > 0) {
+              // Legacy array format
+              parsedContent.forEach((section: any) => {
+                if (section.cards && section.cards.length > 0) {
+                  const firstCardId = section.cards[0].id || `${section.id}-item-0`;
                   initialExpandedState[firstCardId] = true;
                 }
               });
-            } else if (parsedContent.cards && parsedContent.cards.length > 0) {
-              // Single service format
-              const firstCardId = parsedContent.cards[0].id || `${data.id}-item-0`;
-              initialExpandedState[firstCardId] = true;
             }
-          } else if (Array.isArray(parsedContent) && parsedContent.length > 0) {
-            // Legacy array format
-            parsedContent.forEach((section: any) => {
-              if (section.cards && section.cards.length > 0) {
-                const firstCardId = section.cards[0].id || `${section.id}-item-0`;
-                initialExpandedState[firstCardId] = true;
-              }
-            });
+            
+            // Update expanded cards state
+            setExpandedCards(initialExpandedState);
+          } catch (e) {
+            console.error('Error setting initial expanded cards:', e);
           }
-          
-          // Update expanded cards state
-          setExpandedCards(initialExpandedState);
-        } catch (e) {
-          console.error('Error setting initial expanded cards:', e);
         }
+        
+        setError(null);
+      } catch (error: unknown) {
+        console.error('Error fetching services data:', error);
+        if (error && typeof error === 'object' && 'response' in error && 
+            error.response && typeof error.response === 'object' && 'status' in error.response && 
+            error.response.status === 429) {
+          setError('Too many requests. Please try again in a moment.');
+        } else {
+          setError('Failed to load services data');
+        }
+      } finally {
+        setLoading(false);
       }
-      
-      setError(null);
-    } catch (error: unknown) {
-      console.error('Error fetching services data:', error);
-      if (error && typeof error === 'object' && 'response' in error && 
-          error.response && typeof error.response === 'object' && 'status' in error.response && 
-          error.response.status === 429) {
-        setError('Too many requests. Please try again in a moment.');
-      } else {
-        setError('Failed to load services data');
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [locale]);
-  
-  // Debounced version of fetchSectionData
-  const debouncedFetchData = useCallback(debounce(fetchSectionData, 300), [fetchSectionData]);
-  
-  useEffect(() => {
-    debouncedFetchData();
+    };
+    
+    fetchSectionData();
     
     // Cleanup function
     return () => {
       // Any cleanup if needed
     };
-  }, [debouncedFetchData]);
+  }, [locale]);
 
   // Function to handle image errors
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
@@ -396,13 +381,15 @@ export default function Services({
                           <div className="flex justify-center md:w-1/3 px-8">
                             <div className="fixed-image-container">
                               <Image
-                                src={section.imageUrl || t(`images.service${serviceSections.indexOf(section) + 1}` as any) || t('images.default')}
+                                src={resolveImagePath(section.imageUrl || t(`images.service${serviceSections.indexOf(section) + 1}` as any) || t('images.default'))}
                                 alt={section.title}
                                 width={500}
                                 height={420}
                                 className="w-full h-full object-contain max-h-[420px]"
                                 onError={handleImageError}
                                 priority
+                                unoptimized={process.env.NODE_ENV === 'production'}
+                                loading="lazy"
                               />
                             </div>
                           </div>
@@ -444,12 +431,14 @@ export default function Services({
                                           {card.imageUrl && card.imageUrl.trim() !== '' && (
                                             <div className="mb-4 overflow-hidden rounded-lg max-h-[300px]">
                                               <Image
-                                                src={card.imageUrl}
+                                                src={resolveImagePath(card.imageUrl)}
                                                 alt={card.title}
                                                 width={600}
                                                 height={300}
                                                 className="w-full object-contain"
                                                 onError={handleImageError}
+                                                unoptimized={process.env.NODE_ENV === 'production'}
+                                                loading="lazy"
                                               />
                                             </div>
                                           )}
@@ -482,12 +471,14 @@ export default function Services({
                                         {card.imageUrl && card.imageUrl.trim() !== '' && (
                                           <div className="mb-4 overflow-hidden rounded-lg">
                                             <Image
-                                              src={card.imageUrl}
+                                              src={resolveImagePath(card.imageUrl)}
                                               alt={card.title}
                                               width={400}
                                               height={200}
                                               className="w-full object-contain"
                                               onError={handleImageError}
+                                              unoptimized={process.env.NODE_ENV === 'production'}
+                                              loading="lazy"
                                             />
                                           </div>
                                         )}

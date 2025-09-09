@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "build": "cross-env NODE_OPTIONS='--max-old-space-size=450' next build",
+    "start": "cross-env NODE_OPTIONS='--max-old-space-size=450 --expose-gc' node server.js",
     "lint": "next lint",
-    "install:prod": "npm install --legacy-peer-deps"
+    "install:prod": "npm install --legacy-peer-deps --no-optional"
   },
   "dependencies": {
     "axios": "^1.6.2",
@@ -32,6 +32,7 @@
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.17",
     "autoprefixer": "^10.4.16",
+    "cross-env": "^7.0.3",
     "eslint": "^8.55.0",
     "eslint-config-next": "^14.0.4",
     "postcss": "^8.4.32",
