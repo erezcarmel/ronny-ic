@@ -378,7 +378,7 @@ export default function Services({
                       <div key={section.id} className={`py-8 ${serviceSections.indexOf(section) % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
                         <div className={`w-full flex flex-col md:flex-row gap-8 ${serviceSections.indexOf(section) % 2 !== 0 ? 'md:flex-row-reverse' : 'md:flex-row'}`} style={{ contain: 'paint layout' }}>
                           {/* Image Column */}
-                          <div className="flex justify-center md:w-1/3 px-8">
+                          <div className="flex justify-center px-8">
                             <div className="fixed-image-container">
                               <Image
                                 src={resolveImagePath(section.imageUrl || t(`images.service${serviceSections.indexOf(section) + 1}` as any) || t('images.default'))}
@@ -413,7 +413,7 @@ export default function Services({
                                     <div 
                                       key={card.id} 
                                       onClick={() => toggleCard(card.id)}
-                                      className={`bg-white dark:bg-gray-800 rounded-lg shadow-md border p-4 cursor-pointer transition-all duration-300 ${expandedCards[card.id] ? 'bg-[#DEE4FB] shadow-lg' : 'border-gray-100 hover:shadow-md'}`}
+                                      className={`dark:bg-gray-800 rounded-lg shadow-md border p-4 cursor-pointer transition-all duration-300 ${expandedCards[card.id] ? 'bg-[#DEE4FB] shadow-lg' : 'bg-white border-gray-100 hover:shadow-md'}`}
                                     >
                                       <h3 className={`text-lg font-bold ${isRtl ? 'text-right' : 'text-left'}`}>
                                         {card.title}
