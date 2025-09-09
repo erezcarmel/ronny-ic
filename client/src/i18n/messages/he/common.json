@@ -16,7 +16,14 @@
     "noServices": "עדיין לא נוספו שירותים. אנא בדוק שוב מאוחר יותר.",
     "noCards": "אין כרטיסים זמינים לשירות זה.",
     "showLess": "הסתר",
-    "readMore": "קרא עוד"
+    "readMore": "קרא עוד",
+    "images": {
+     "service1": "/images/clinic.jpg",
+      "service2": "/images/bg2.webp",
+      "service3": "/images/iac.jpg",
+      "service4": "/images/podcast.jpg",
+      "default": "/images/ronny.jpg"
+    }
   },
   "articles": {
     "title": "מאמרים",

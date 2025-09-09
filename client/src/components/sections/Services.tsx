@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useLocale } from '@/i18n/LocaleProvider';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import apiService from '@/lib/utils/api';
 
@@ -44,6 +44,35 @@ interface Section {
   contents: SectionContent[];
 }
 
+// Add custom CSS at the top of the component
+const customStyles = `
+  .fixed-image-container {
+    position: relative;
+    width: fit-content;
+    height: min-content;
+    min-height: 300px;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  @media (min-width: 768px) {
+    .fixed-image-container {
+      position: sticky;
+      top: 6rem;
+    }
+  }
+  
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+`;
+
 export default function Services({
   title,
   content,
@@ -56,7 +85,7 @@ export default function Services({
   const [sectionData, setSectionData] = useState<Section | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [expandedSections, setExpandedSections] = useState<{[key: string]: boolean}>({ services: false });
+  const [expandedCards, setExpandedCards] = useState<{[key: string]: boolean}>({});
   
   // Animation when section comes into view
   const [ref, inView] = useInView({
@@ -69,49 +98,90 @@ export default function Services({
     visible: { opacity: 1, y: 0 },
   };
 
-  // Fetch section data from API
-  useEffect(() => {
-    const fetchSectionData = async () => {
-      try {
-        setLoading(true);
-        const data = await apiService.sections.getByType('services', locale);
-        setSectionData(data);
-        
-        if (data && data.id) {
-          // Initialize all sections to be collapsed by default
-          const initialExpandedState: {[key: string]: boolean} = { [data.id]: false };
+  // Debounce function to limit API calls
+  const debounce = <T extends (...args: any[]) => any>(func: T, wait: number) => {
+    let timeout: NodeJS.Timeout | null = null;
+    return function executedFunction(...args: Parameters<T>) {
+      const later = () => {
+        if (timeout) clearTimeout(timeout);
+        func(...args);
+      };
+      if (timeout) clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  };
+
+  // Fetch section data from API with debouncing
+  const fetchSectionData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await apiService.sections.getByType('services', locale);
+      setSectionData(data);
+      
+      // Initialize with the first card of each section selected
+      if (data && data.contents && data.contents[0]?.content) {
+        try {
+          const parsedContent = JSON.parse(data.contents[0].content);
+          const initialExpandedState: {[key: string]: boolean} = {};
           
-          // If there are service sections, set them all to collapsed
-          if (data.contents?.[0]?.content) {
-            try {
-              const parsedContent = JSON.parse(data.contents[0].content);
-              if (parsedContent?.services && Array.isArray(parsedContent.services)) {
-                parsedContent.services.forEach((service: any, index: number) => {
-                  initialExpandedState[`service-${data.id}-${index}`] = false;
-                });
-              }
-            } catch (e) {
-              console.error('Error parsing services for expanded state:', e);
+          // Handle different content formats
+          if (parsedContent && typeof parsedContent === 'object' && !Array.isArray(parsedContent)) {
+            if (parsedContent.services && Array.isArray(parsedContent.services)) {
+              // Multiple services format
+              parsedContent.services.forEach((service: any, sIndex: number) => {
+                if (service.cards && service.cards.length > 0) {
+                  const firstCardId = service.cards[0].id || `service-${data.id}-${sIndex}-item-0`;
+                  initialExpandedState[firstCardId] = true;
+                }
+              });
+            } else if (parsedContent.cards && parsedContent.cards.length > 0) {
+              // Single service format
+              const firstCardId = parsedContent.cards[0].id || `${data.id}-item-0`;
+              initialExpandedState[firstCardId] = true;
             }
+          } else if (Array.isArray(parsedContent) && parsedContent.length > 0) {
+            // Legacy array format
+            parsedContent.forEach((section: any) => {
+              if (section.cards && section.cards.length > 0) {
+                const firstCardId = section.cards[0].id || `${section.id}-item-0`;
+                initialExpandedState[firstCardId] = true;
+              }
+            });
           }
           
-          setExpandedSections(prev => ({
-            ...prev,
-            ...initialExpandedState
-          }));
+          // Update expanded cards state
+          setExpandedCards(initialExpandedState);
+        } catch (e) {
+          console.error('Error setting initial expanded cards:', e);
         }
-        
-        setError(null);
-      } catch (error) {
-        console.error('Error fetching services data:', error);
-        setError('Failed to load services data');
-      } finally {
-        setLoading(false);
       }
-    };
-    
-    fetchSectionData();
+      
+      setError(null);
+    } catch (error: unknown) {
+      console.error('Error fetching services data:', error);
+      if (error && typeof error === 'object' && 'response' in error && 
+          error.response && typeof error.response === 'object' && 'status' in error.response && 
+          error.response.status === 429) {
+        setError('Too many requests. Please try again in a moment.');
+      } else {
+        setError('Failed to load services data');
+      }
+    } finally {
+      setLoading(false);
+    }
   }, [locale]);
+  
+  // Debounced version of fetchSectionData
+  const debouncedFetchData = useCallback(debounce(fetchSectionData, 300), [fetchSectionData]);
+  
+  useEffect(() => {
+    debouncedFetchData();
+    
+    // Cleanup function
+    return () => {
+      // Any cleanup if needed
+    };
+  }, [debouncedFetchData]);
 
   // Function to handle image errors
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
@@ -122,14 +192,20 @@ export default function Services({
     }
   };
   
-  // Function to toggle section expansion
-  const toggleSection = (sectionId: string) => {
-    setExpandedSections(prev => {
-      const newState = {
-        ...prev,
-        [sectionId]: !prev[sectionId]
+  // Function to toggle card expansion
+  const toggleCard = (cardId: string) => {
+    setExpandedCards(prev => {
+      // First, close all other cards
+      const allClosed = Object.keys(prev).reduce((acc, key) => {
+        acc[key] = false;
+        return acc;
+      }, {} as {[key: string]: boolean});
+      
+      // Then toggle the selected card
+      return {
+        ...allClosed,
+        [cardId]: !prev[cardId]
       };
-      return newState;
     });
   };
   
@@ -149,7 +225,8 @@ export default function Services({
             return parsedContent.services.map((service: any, index: number) => ({
               id: `service-${sectionData.id}-${index}`,
               title: service.title,
-              description: service.description,
+              // Ensure description is properly preserved as HTML
+              description: service.description || '',
               cards: service.cards || [],
               imageUrl: service.imageUrl || sectionData.contents[0]?.imageUrl
             }));
@@ -160,7 +237,8 @@ export default function Services({
             return [{
               id: sectionData.id,
               title: parsedContent.title,
-              description: parsedContent.description,
+              // Ensure description is properly preserved as HTML
+              description: parsedContent.description || '',
               cards: parsedContent.cards,
               imageUrl: parsedContent.imageUrl || sectionData.contents[0]?.imageUrl
             }];
@@ -217,20 +295,32 @@ export default function Services({
               }
             }
             
-            // Extract just the first paragraph for description
+            // Extract description from content
             let description = '';
             if (typeof section.content === 'string') {
-              // Create a temporary div to parse HTML content
-              const tempDiv = document.createElement('div');
-              tempDiv.innerHTML = section.content;
-              
-              // Get the first paragraph or first element if no paragraphs
-              const firstParagraph = tempDiv.querySelector('p');
-              if (firstParagraph) {
-                description = firstParagraph.innerHTML;
+              // If the content is already in HTML format, use it directly
+              if (section.content.trim().startsWith('<')) {
+                // Get the first paragraph or content before first h4 as description
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = section.content;
+                
+                // Get the first paragraph or first element if no paragraphs
+                const firstParagraph = tempDiv.querySelector('p');
+                if (firstParagraph) {
+                  // Use the entire paragraph as HTML
+                  description = firstParagraph.outerHTML;
+                } else {
+                  // If no paragraph, take content before first h4 tag or use all content
+                  const h4Index = section.content.indexOf('<h4');
+                  if (h4Index > 0) {
+                    description = section.content.substring(0, h4Index);
+                  } else {
+                    description = section.content;
+                  }
+                }
               } else {
-                // If no paragraph, just take the first part of content
-                description = section.content.split('</h4>')[0].replace(/<\/?[^>]+(>|$)/g, '');
+                // Plain text content, wrap in paragraph
+                description = `<p>${section.content}</p>`;
               }
             }
             
@@ -255,18 +345,26 @@ export default function Services({
   
   const serviceSections = parseServiceSections();
   
-  // Debug each service section
-  serviceSections.forEach((section, index) => {  
-    // Check if cards is undefined or empty
-    if (!section.cards || section.cards.length === 0) {
-    } else {
-      section.cards.forEach((card, cardIndex) => {
+  // Ensure the first card of each section is selected if none are selected
+  useEffect(() => {
+    if (serviceSections.length > 0 && Object.keys(expandedCards).length === 0) {
+      const initialState: {[key: string]: boolean} = {};
+      
+      serviceSections.forEach(section => {
+        if (section.cards && section.cards.length > 0) {
+          initialState[section.cards[0].id] = true;
+        }
       });
+      
+      if (Object.keys(initialState).length > 0) {
+        setExpandedCards(initialState);
+      }
     }
-  });
+  }, [serviceSections, expandedCards]);
   
   return (
     <section id="services" className={`services-section w-full max-w-full pt-8 ${isRtl ? 'pb-0' : 'pb-8'}`}>
+      <style dangerouslySetInnerHTML={{ __html: customStyles }} />
       <div className="w-full">
         {loading ? (
           <div className="flex justify-center items-center py-12">
@@ -282,7 +380,7 @@ export default function Services({
             initial="hidden"
             animate={inView ? 'visible' : 'hidden'}
             variants={variants}
-            transition={{ duration: 0.6 }}
+            // transition={{ duration: 0.6 }}
             className={`${isRtl ? 'rtl' : 'ltr'}`}
           > 
             <div>
@@ -293,25 +391,20 @@ export default function Services({
                   {serviceSections.length > 0 ? (
                     serviceSections.map((section) => (
                       <div key={section.id} className={`py-8 ${serviceSections.indexOf(section) % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                        <div className={`w-full flex flex-col md:flex-row gap-8 ${serviceSections.indexOf(section) % 2 !== 0 ? 'md:flex-row-reverse' : 'md:flex-row'}`}>
-                          {/* Image Column - Full height */}
-                          <div className="md:w-1/3 flex justify-center">
-                            {section.imageUrl ? (
-                              <div className="relative w-full h-full min-h-[300px] overflow-hidden rounded-lg shadow-lg">
-                                <Image
-                                  src={section.imageUrl}
-                                  alt={section.title}
-                                  width={500}
-                                  height={800}
-                                  className="w-full h-full object-cover sticky top-24"
-                                  onError={handleImageError}
-                                />
-                              </div>
-                            ) : (
-                              <div className="relative w-full h-full min-h-[300px] bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center sticky top-24">
-                                <span className="text-gray-500 dark:text-gray-400">No image available</span>
-                              </div>
-                            )}
+                        <div className={`w-full flex flex-col md:flex-row gap-8 ${serviceSections.indexOf(section) % 2 !== 0 ? 'md:flex-row-reverse' : 'md:flex-row'}`} style={{ contain: 'paint layout' }}>
+                          {/* Image Column */}
+                          <div className="flex justify-center md:w-1/3 px-8">
+                            <div className="fixed-image-container">
+                              <Image
+                                src={section.imageUrl || t(`images.service${serviceSections.indexOf(section) + 1}` as any) || t('images.default')}
+                                alt={section.title}
+                                width={500}
+                                height={420}
+                                className="w-full h-full object-contain max-h-[420px]"
+                                onError={handleImageError}
+                                priority
+                              />
+                            </div>
                           </div>
                           
                           {/* Content Column - Title, Description, Cards */}
@@ -319,66 +412,96 @@ export default function Services({
                             <h2 className={`font-bold ${section.cards && section.cards.length > 0 ? 'text-3xl mb-4' : 'text-2xl mb-0'}`}>
                               {section.title}
                             </h2>
-                            { section.description && (
+                            {section.description && (
                               <div className={`text-base text-gray-700 dark:text-gray-300 mb-6 max-w-6xl`}>
                                 <div dangerouslySetInnerHTML={{ __html: section.description }} />
                               </div>
                             )}
                             
                             {section.cards && section.cards.length > 0 && (
-                              <div className="mb-4">
-                                <button
-                                  onClick={() => toggleSection(section.id)}
-                                  className="flex gap-2 text-md text-gray-700 hover:text-[#555599] px-0 py-2 rounded-full transition-all duration-300 flex items-center space-x-2 hover:bg-transparent"
-                                >
-                                  <span>{expandedSections[section.id] ? t('showLess') : t('readMore')}</span>
-                                  <svg 
-                                    className={`w-5 h-5 transition-transform duration-300 ${expandedSections[section.id] ? 'rotate-180' : ''}`} 
-                                    fill="none" 
-                                    stroke="currentColor" 
-                                    viewBox="0 0 24 24" 
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                                  </svg>
-                                </button>
-                              </div>
-                            )}
-                            
-                            {section.cards && section.cards.length > 0 && (
-                              <div 
-                                className={`flex flex-wrap justify-start overflow-visible gap-6 w-full transition-all duration-500 ease-in-out`}
-                              >
-                            {section.cards.map((card) => (
-                              <div key={card.id} className={`bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg border border-gray-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex-shrink-0 w-full md:w-[calc(50%-12px)] lg:w-[calc(50%-12px)] ${expandedSections[section.id] ? 'p-0' : 'p-4'}`}>
-                                {expandedSections[section.id] && card.imageUrl && card.imageUrl.trim() !== '' && (
-                                  <div className="h-48 overflow-hidden">
-                                    <Image
-                                      src={card.imageUrl}
-                                      alt={card.title}
-                                      width={300}
-                                      height={300}
-                                      className="w-full h-full object-cover"
-                                      onError={handleImageError}
-                                    />
-                                  </div>
-                                )}
-                                <div className={expandedSections[section.id] ? "p-4" : ""}>
-                                  <h3 className={`text-lg font-bold ${expandedSections[section.id] ? 'mb-3' : 'mb-0'} ${isRtl ? 'text-right' : 'text-left'}`}>
-                                    {card.title}
-                                  </h3>
-                                  {expandedSections[section.id] && (
-                                    <div className={`prose dark:prose-invert ${isRtl ? 'text-right' : 'text-left'}`}>
-                                      {typeof card.content === 'string' ? (
-                                        <div dangerouslySetInnerHTML={{ __html: card.content }} />
-                                      ) : (
-                                        <p>{card.content}</p>
-                                      )}
+                              <div className="flex flex-col md:flex-row gap-6 w-full">
+                                {/* Left side: Vertical list of card titles */}
+                                <div className="w-full md:w-1/3 flex flex-col gap-2 pb-2">
+                                  {section.cards.map((card) => (
+                                    <div 
+                                      key={card.id} 
+                                      onClick={() => toggleCard(card.id)}
+                                      className={`bg-white dark:bg-gray-800 rounded-lg shadow-md border p-4 cursor-pointer transition-all duration-300 ${expandedCards[card.id] ? 'bg-[#DEE4FB] shadow-lg' : 'border-gray-100 hover:shadow-md'}`}
+                                    >
+                                      <h3 className={`text-lg font-bold ${isRtl ? 'text-right' : 'text-left'}`}>
+                                        {card.title}
+                                      </h3>
+                                    </div>
+                                  ))}
+                                </div>
+                                
+                                {/* Right side: Selected card content */}
+                                <div className="hidden md:block w-full md:w-2/3 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-100 p-6 min-h-[300px]">
+                                  {section.cards.some(card => expandedCards[card.id]) ? (
+                                    section.cards.map((card) => (
+                                      expandedCards[card.id] && (
+                                        <div key={`content-${card.id}`} className="animate-fadeIn">
+                                          {card.imageUrl && card.imageUrl.trim() !== '' && (
+                                            <div className="mb-4 overflow-hidden rounded-lg max-h-[300px]">
+                                              <Image
+                                                src={card.imageUrl}
+                                                alt={card.title}
+                                                width={600}
+                                                height={300}
+                                                className="w-full object-contain"
+                                                onError={handleImageError}
+                                              />
+                                            </div>
+                                          )}
+                                          <h2 className="text-xl font-bold mb-4">{card.title}</h2>
+                                          <div className={`prose dark:prose-invert ${isRtl ? 'text-right' : 'text-left'} max-w-none`}>
+                                            {typeof card.content === 'string' ? (
+                                              <div dangerouslySetInnerHTML={{ __html: card.content }} />
+                                            ) : (
+                                              <p>{card.content}</p>
+                                            )}
+                                          </div>
+                                        </div>
+                                      )
+                                    ))
+                                  ) : (
+                                    <div className="h-full flex items-center justify-center text-gray-500">
+                                      <p>{t('selectCard') || 'Select a card to view content'}</p>
                                     </div>
                                   )}
                                 </div>
-                              </div>
-                            ))}
+                                
+                                {/* Mobile view: Show expanded content below the card */}
+                                <div className="md:hidden w-full">
+                                  {section.cards.map((card) => (
+                                    expandedCards[card.id] && (
+                                      <div 
+                                        key={`mobile-content-${card.id}`} 
+                                        className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-100 p-4 mt-2"
+                                      >
+                                        {card.imageUrl && card.imageUrl.trim() !== '' && (
+                                          <div className="mb-4 overflow-hidden rounded-lg">
+                                            <Image
+                                              src={card.imageUrl}
+                                              alt={card.title}
+                                              width={400}
+                                              height={200}
+                                              className="w-full object-contain"
+                                              onError={handleImageError}
+                                            />
+                                          </div>
+                                        )}
+                                        <div className={`prose dark:prose-invert ${isRtl ? 'text-right' : 'text-left'} max-w-none`}>
+                                          {typeof card.content === 'string' ? (
+                                            <div dangerouslySetInnerHTML={{ __html: card.content }} />
+                                          ) : (
+                                            <p>{card.content}</p>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )
+                                  ))}
+                                </div>
                               </div>
                             )}
                           </div>

@@ -46,6 +46,12 @@ body {
   }
 }
 
+#services {
+  a {
+    @apply text-[#555599] hover:underline;
+  }
+}
+
 /* Container with custom padding */
 .container-custom {
   @apply container mx-auto px-4 sm:px-6 lg:px-8;

@@ -1,5 +1,40 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
+// Simple cache implementation
+const cache = {
+  data: {} as Record<string, {value: any, timestamp: number}>,
+  get: function(key: string) {
+    const item = this.data[key];
+    if (!item) return null;
+    
+    // Check if cache is still valid (10 minutes)
+    const now = Date.now();
+    if (now - item.timestamp > 10 * 60 * 1000) {
+      delete this.data[key];
+      return null;
+    }
+    
+    return item.value;
+  },
+  set: function(key: string, value: any) {
+    this.data[key] = {
+      value,
+      timestamp: Date.now()
+    };
+  },
+  invalidate: function(pattern?: RegExp) {
+    if (pattern) {
+      Object.keys(this.data).forEach(key => {
+        if (pattern.test(key)) {
+          delete this.data[key];
+        }
+      });
+    } else {
+      this.data = {};
+    }
+  }
+};
+
 // API base URL
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
@@ -132,18 +167,68 @@ export const apiService = {
   
   // Sections endpoints
   sections: {
-    getAll: (language?: string) => 
-      apiRequest('GET', `/sections?language=${language || 'en'}`),
-    getById: (id: string, language?: string, admin: boolean = false) => 
-      apiRequest('GET', `/sections/${id}?language=${language || 'en'}&admin=${admin}`),
-    getByType: (type: string, language?: string) => 
-      apiRequest('GET', `/sections/type/${type}?language=${language || 'en'}`),
-    create: (data: any) => 
-      apiRequest('POST', '/sections', data),
-    update: (id: string, data: any) => 
-      apiRequest('PUT', `/sections/${id}`, data),
-    delete: (id: string) => 
-      apiRequest('DELETE', `/sections/${id}`),
+    getAll: (language?: string) => {
+      const cacheKey = `sections_all_${language || 'en'}`;
+      const cachedData = cache.get(cacheKey);
+      
+      if (cachedData) {
+        return Promise.resolve(cachedData);
+      }
+      
+      return apiRequest('GET', `/sections?language=${language || 'en'}`)
+        .then(data => {
+          cache.set(cacheKey, data);
+          return data;
+        });
+    },
+    getById: (id: string, language?: string, admin: boolean = false) => {
+      // Don't cache admin requests
+      if (admin) {
+        return apiRequest('GET', `/sections/${id}?language=${language || 'en'}&admin=${admin}`);
+      }
+      
+      const cacheKey = `sections_${id}_${language || 'en'}`;
+      const cachedData = cache.get(cacheKey);
+      
+      if (cachedData) {
+        return Promise.resolve(cachedData);
+      }
+      
+      return apiRequest('GET', `/sections/${id}?language=${language || 'en'}&admin=${admin}`)
+        .then(data => {
+          cache.set(cacheKey, data);
+          return data;
+        });
+    },
+    getByType: (type: string, language?: string) => {
+      const cacheKey = `sections_type_${type}_${language || 'en'}`;
+      const cachedData = cache.get(cacheKey);
+      
+      if (cachedData) {
+        return Promise.resolve(cachedData);
+      }
+      
+      return apiRequest('GET', `/sections/type/${type}?language=${language || 'en'}`)
+        .then(data => {
+          cache.set(cacheKey, data);
+          return data;
+        });
+    },
+    create: (data: any) => {
+      // Invalidate all section caches when creating a new section
+      cache.invalidate(/^sections_/);
+      return apiRequest('POST', '/sections', data);
+    },
+    update: (id: string, data: any) => {
+      // Invalidate specific section cache and all section lists
+      cache.invalidate(/^sections_/);
+      return apiRequest('PUT', `/sections/${id}`, data);
+    },
+    delete: (id: string) => {
+      // Invalidate all section caches when deleting a section
+      cache.invalidate(/^sections_/);
+      return apiRequest('DELETE', `/sections/${id}`);
+    },
     uploadFile: (file: File) => {
       const formData = new FormData();
       formData.append('file', file);

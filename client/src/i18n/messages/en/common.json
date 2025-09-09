@@ -16,7 +16,14 @@
     "noServices": "No services have been added yet. Please check back later.",
     "noCards": "No cards available for this service.",
     "showLess": "Show Less",
-    "readMore": "Read More"
+    "readMore": "Read More",
+    "images": {
+      "service1": "/images/clinic.jpg",
+      "service2": "/images/bg2.webp",
+      "service3": "/images/iac.jpg",
+      "service4": "/images/podcast.jpg",
+      "default": "/images/ronny.jpg"
+    }
   },
   "articles": {
     "title": "Articles",

@@ -600,13 +600,23 @@ export default function ServicesForm({ initialData, onSubmit, onCancel }: Servic
                   <label className="block text-gray-700 dark:text-gray-300 mb-2">
                     Service Description
                   </label>
-                  <textarea
-                    value={currentSections[activeSectionIndex].description || ''}
-                    onChange={(e) => handleSectionChange(activeSectionIndex, 'description', e.target.value)}
-                    className="form-textarea w-full"
-                    rows={3}
-                    placeholder="Enter service description"
-                  />
+                  <div className="prose-editor" dir={activeTab === 'he' ? 'rtl' : 'ltr'}>
+                    <ReactQuill
+                      value={currentSections[activeSectionIndex].description || ''}
+                      onChange={(value) => handleSectionChange(activeSectionIndex, 'description', value)}
+                      modules={{
+                        toolbar: [
+                          [{ 'header': [1, 2, 3, false] }],
+                          ['bold', 'italic', 'underline'],
+                          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                          ['link'],
+                          ['clean']
+                        ],
+                      }}
+                      placeholder="Enter service description"
+                    />
+                  </div>
+                  <p className="text-sm text-gray-500 mt-1">This description will appear at the top of the service section.</p>
                 </div>
                 
                 <hr className="my-6" />
