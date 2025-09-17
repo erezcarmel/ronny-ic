@@ -88,7 +88,7 @@ export default function Hero({ title, subtitle }: HeroProps) {
       style={backgroundStyle}
     >
       {/* Semi-transparent overlay */}
-      <div className="absolute inset-0 bg-gray-50 opacity-70"></div>
+      <div className="absolute inset-0 bg-[#DEE4FB] opacity-70"></div>
       
       <div className="container-custom relative z-10 pt-12">
         <div className={`text-center ${isRtl ? 'rtl' : 'ltr'}`}>

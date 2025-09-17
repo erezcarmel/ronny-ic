@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Locale, locales } from '@/i18n';
+import { locales } from '@/i18n';
 import { cn } from '@/lib/utils';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { getMessages } from '@/i18n/config';
 
-export default function LanguageSwitcher() {
+export default function LanguageSwitcher({ className }: { className?: string }) {
   const { locale, setLocale } = useLocale();
   const [translations, setTranslations] = useState<any>(null);
   
@@ -21,7 +21,7 @@ export default function LanguageSwitcher() {
   }
   
   return (
-    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+    <div className={cn("flex items-center space-x-2 rtl:space-x-reverse", className)}>
       <div className="flex items-center space-x-1 rtl:space-x-reverse">
         {locales.map((loc) => (
           <button

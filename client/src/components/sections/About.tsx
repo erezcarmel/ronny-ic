@@ -97,9 +97,9 @@ export default function About({ title, content, imageUrl }: AboutProps) {
             transition={{ duration: 0.6 }}
             className={`${isRtl ? "rtl" : "ltr"}`}
           >
-            <div className="flex flex-col md:flex-row gap-8 items-stretch min-h-[400px]">
+            <div className="flex flex-col md:flex-row gap-8 items-stretch min-h-[400px] max-w-screen-lg mx-auto">
               <div className={`${isRtl ? "order-2" : "order-1"} flex-1`}>
-                <div className="prose dark:prose-invert max-w-none h-full">
+                <div className="max-w-none h-full text-sm pt-8">
                   {sectionContent && (
                     <div dangerouslySetInnerHTML={{ __html: sectionContent }} />
                   )}

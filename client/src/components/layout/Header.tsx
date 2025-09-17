@@ -98,6 +98,7 @@ export default function Header() {
   
   // Navigation items - conditionally include articles based on locale
   const navItems = [
+    { href: '/#services', label: translations.services },
     { href: '/#about', label: translations.about },
     ...(isSectionVisible('articles', locale) ? [{ href: '/#articles', label: translations.articles }] : []),
     { href: '/#contact', label: translations.contact },
@@ -150,7 +151,7 @@ export default function Header() {
             ))}
             
             {/* Language Switcher */}
-            <LanguageSwitcher />
+            <LanguageSwitcher className="hidden sm:block" />
           </nav>
 
           {/* Mobile Menu Button */}
