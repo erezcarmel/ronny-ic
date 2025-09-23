@@ -1,8 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { getMessages } from '@/i18n/config';
+
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+import 'react-quill/dist/quill.snow.css';
 
 interface HeroFormProps {
   initialData?: any;
@@ -20,6 +24,8 @@ export default function HeroForm({ initialData, onSubmit, onCancel }: HeroFormPr
   const [titleHe, setTitleHe] = useState('');
   const [subtitleEn, setSubtitleEn] = useState('');
   const [subtitleHe, setSubtitleHe] = useState('');
+  const [bottomSubtitleEn, setBottomSubtitleEn] = useState('');
+  const [bottomSubtitleHe, setBottomSubtitleHe] = useState('');
   const [buttonTextEn, setButtonTextEn] = useState('');
   const [buttonTextHe, setButtonTextHe] = useState('');
   const [published, setPublished] = useState(true);
@@ -41,6 +47,7 @@ export default function HeroForm({ initialData, onSubmit, onCancel }: HeroFormPr
       if (enContent) {
         setTitleEn(enContent.title || '');
         setSubtitleEn(enContent.subtitle || '');
+        setBottomSubtitleEn(enContent.bottomSubtitle || '');
         setButtonTextEn(enContent.content || 'Contact Me');
         if (enContent.imageUrl) {
           setBackgroundImage(enContent.imageUrl);
@@ -53,6 +60,7 @@ export default function HeroForm({ initialData, onSubmit, onCancel }: HeroFormPr
       if (heContent) {
         setTitleHe(heContent.title || '');
         setSubtitleHe(heContent.subtitle || '');
+        setBottomSubtitleHe(heContent.bottomSubtitle || '');
         setButtonTextHe(heContent.content || 'צור קשר');
       }
     }
@@ -85,6 +93,7 @@ export default function HeroForm({ initialData, onSubmit, onCancel }: HeroFormPr
             language: 'en',
             title: titleEn,
             subtitle: subtitleEn,
+            bottomSubtitle: bottomSubtitleEn,
             content: buttonTextEn, // Store button text in content field
             imageUrl: backgroundImage,
           },
@@ -92,6 +101,7 @@ export default function HeroForm({ initialData, onSubmit, onCancel }: HeroFormPr
             language: 'he',
             title: titleHe,
             subtitle: subtitleHe,
+            bottomSubtitle: bottomSubtitleHe,
             content: buttonTextHe, // Store button text in content field
             imageUrl: backgroundImage,
           }
@@ -194,6 +204,26 @@ export default function HeroForm({ initialData, onSubmit, onCancel }: HeroFormPr
             
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Bottom Subtitle
+              </label>
+              <div className="prose-editor">
+                <ReactQuill
+                  value={bottomSubtitleEn}
+                  onChange={setBottomSubtitleEn}
+                  modules={{
+                    toolbar: [
+                      ['bold', 'italic', 'underline'],
+                      ['link'],
+                      ['clean']
+                    ],
+                  }}
+                  placeholder="Small text at bottom"
+                />
+              </div>
+            </div>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Button Text
               </label>
               <input
@@ -236,6 +266,26 @@ export default function HeroForm({ initialData, onSubmit, onCancel }: HeroFormPr
                 placeholder="כותרת משנה"
                 dir="rtl"
               />
+            </div>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Bottom Subtitle
+              </label>
+              <div className="prose-editor" dir="rtl">
+                <ReactQuill
+                  value={bottomSubtitleHe}
+                  onChange={setBottomSubtitleHe}
+                  modules={{
+                    toolbar: [
+                      ['bold', 'italic', 'underline'],
+                      ['link'],
+                      ['clean']
+                    ],
+                  }}
+                  placeholder="טקסט קטן בתחתית"
+                />
+              </div>
             </div>
             
             <div className="mb-4">

@@ -12,9 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const prisma_1 = require("../generated/prisma");
+const client_1 = require("@prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const prisma = new prisma_1.PrismaClient();
+const prisma = new client_1.PrismaClient();
 function createAdminUser() {
     return __awaiter(this, void 0, void 0, function* () {
         try {

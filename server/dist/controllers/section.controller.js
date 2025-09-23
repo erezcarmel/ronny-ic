@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteSection = exports.updateSection = exports.createSection = exports.getSectionById = exports.getAllSections = void 0;
+exports.deleteSection = exports.updateSection = exports.createSection = exports.getSectionById = exports.getSectionByType = exports.getAllSections = void 0;
 const prisma_1 = __importDefault(require("../utils/prisma"));
 // Get all sections
 const getAllSections = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -39,15 +39,45 @@ const getAllSections = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.getAllSections = getAllSections;
+// Get section by type
+const getSectionByType = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { type } = req.params;
+        const { language = 'en' } = req.query;
+        const section = yield prisma_1.default.section.findFirst({
+            where: {
+                type: String(type),
+                isPublished: true
+            },
+            include: {
+                contents: {
+                    where: {
+                        language: String(language),
+                    },
+                },
+            },
+        });
+        if (!section) {
+            return res.status(404).json({ message: 'Section not found' });
+        }
+        res.status(200).json(section);
+    }
+    catch (error) {
+        console.error('Get section by type error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+exports.getSectionByType = getSectionByType;
 // Get section by ID
 const getSectionById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const { language = 'en' } = req.query;
+        const { language = 'en', admin = 'false' } = req.query;
+        // For admin view, include all languages
         const section = yield prisma_1.default.section.findUnique({
             where: { id },
             include: {
-                contents: {
+                contents: admin === 'true' ? true : {
                     where: {
                         language: String(language),
                     },
@@ -85,6 +115,7 @@ const createSection = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                         language: content.language,
                         title: content.title,
                         subtitle: content.subtitle,
+                        bottomSubtitle: content.bottomSubtitle,
                         content: content.content,
                         imageUrl: content.imageUrl,
                     })),
@@ -129,21 +160,44 @@ const updateSection = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                     // Update existing content
                     yield prisma_1.default.sectionContent.update({
                         where: { id: content.id },
-                        data: Object.assign(Object.assign(Object.assign(Object.assign({}, (content.title !== undefined && { title: content.title })), (content.subtitle !== undefined && { subtitle: content.subtitle })), (content.content !== undefined && { content: content.content })), (content.imageUrl !== undefined && { imageUrl: content.imageUrl })),
+                        data: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, (content.title !== undefined && { title: content.title })), (content.subtitle !== undefined && { subtitle: content.subtitle })), (content.bottomSubtitle !== undefined && { bottomSubtitle: content.bottomSubtitle })), (content.content !== undefined && { content: content.content })), (content.imageUrl !== undefined && { imageUrl: content.imageUrl })),
                     });
                 }
                 else {
-                    // Create new content
-                    yield prisma_1.default.sectionContent.create({
-                        data: {
+                    // Check if content for this language already exists
+                    const existingContent = yield prisma_1.default.sectionContent.findFirst({
+                        where: {
                             sectionId: id,
                             language: content.language,
-                            title: content.title,
-                            subtitle: content.subtitle,
-                            content: content.content,
-                            imageUrl: content.imageUrl,
                         },
                     });
+                    if (existingContent) {
+                        // Update existing content
+                        yield prisma_1.default.sectionContent.update({
+                            where: { id: existingContent.id },
+                            data: {
+                                title: content.title,
+                                subtitle: content.subtitle,
+                                bottomSubtitle: content.bottomSubtitle,
+                                content: content.content,
+                                imageUrl: content.imageUrl,
+                            },
+                        });
+                    }
+                    else {
+                        // Create new content
+                        yield prisma_1.default.sectionContent.create({
+                            data: {
+                                sectionId: id,
+                                language: content.language,
+                                title: content.title,
+                                subtitle: content.subtitle,
+                                bottomSubtitle: content.bottomSubtitle,
+                                content: content.content,
+                                imageUrl: content.imageUrl,
+                            },
+                        });
+                    }
                 }
             }
         }

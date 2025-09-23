@@ -9,6 +9,7 @@ const helmet_1 = __importDefault(require("helmet"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const express_rate_limit_1 = require("express-rate-limit");
 const routes_1 = __importDefault(require("./routes"));
+const createDefaultContactInfo_1 = __importDefault(require("./scripts/createDefaultContactInfo"));
 // Load environment variables
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -36,9 +37,18 @@ app.use((err, req, res, next) => {
         message: err.message || 'Internal Server Error',
     });
 });
-// Start server
-app.listen(PORT, () => {
+// Start server first
+const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    // Try to set up contact info, but don't crash if database is not available
+    (0, createDefaultContactInfo_1.default)()
+        .then(() => {
+        console.log('Contact information setup complete');
+    })
+        .catch((error) => {
+        console.error('Error setting up contact information:', error);
+        console.log('Server will continue running without contact info setup');
+    });
 });
 exports.default = app;
 //# sourceMappingURL=index.js.map

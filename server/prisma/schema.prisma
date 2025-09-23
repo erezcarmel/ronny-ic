@@ -35,16 +35,17 @@ model Section {
 
 // Section content with language support
 model SectionContent {
-  id        String   @id @default(uuid())
-  sectionId String
-  section   Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
-  language  String   // "en" or "he"
-  title     String?
-  subtitle  String?
-  content   String?  @db.Text
-  imageUrl  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  sectionId     String
+  section       Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  language      String   // "en" or "he"
+  title         String?
+  subtitle      String?
+  bottomSubtitle String? @db.Text
+  content       String?  @db.Text
+  imageUrl      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@unique([sectionId, language])
 }

@@ -149,6 +149,7 @@ export default function SectionsPage() {
               language: 'en',
               title: formData.titleEn || 'Hero Title',
               subtitle: formData.subtitleEn || 'Hero Subtitle',
+              bottomSubtitle: formData.bottomSubtitleEn || '',
               content: formData.buttonTextEn || 'Contact Me',
               imageUrl: formData.imageUrl
             },
@@ -156,6 +157,7 @@ export default function SectionsPage() {
               language: 'he',
               title: formData.titleHe || 'כותרת ראשית',
               subtitle: formData.subtitleHe || 'כותרת משנה',
+              bottomSubtitle: formData.bottomSubtitleHe || '',
               content: formData.buttonTextHe || 'צור קשר',
               imageUrl: formData.imageUrl
             }
@@ -236,6 +238,7 @@ export default function SectionsPage() {
               language: 'en',
               title: formData.titleEn || 'Hero Title',
               subtitle: formData.subtitleEn || 'Hero Subtitle',
+              bottomSubtitle: formData.bottomSubtitleEn || '',
               content: formData.buttonTextEn || 'Contact Me',
               imageUrl: formData.imageUrl
             },
@@ -243,6 +246,7 @@ export default function SectionsPage() {
               language: 'he',
               title: formData.titleHe || 'כותרת ראשית',
               subtitle: formData.subtitleHe || 'כותרת משנה',
+              bottomSubtitle: formData.bottomSubtitleHe || '',
               content: formData.buttonTextHe || 'צור קשר',
               imageUrl: formData.imageUrl
             }

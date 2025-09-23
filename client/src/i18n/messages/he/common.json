@@ -8,6 +8,12 @@
     "title": "רוני איס-כרמל",
     "subtitle": "פסיכולוגית לילדים, מתבגרים, בוגרים צעירים והורים"
   },
+  "hero": {
+    "title": "רוני איס-כרמל",
+    "subtitle": "פסיכותרפיה למחשבות ורגשות",
+    "bottomSubtitle": "תמיכה פסיכולוגית מקצועית לילדים, מתבגרים, בוגרים צעירים והורים",
+    "contactMe": "צור קשר"
+  },
   "about": {
     "title": "קצת עליי"
   },
@@ -19,7 +25,7 @@
     "readMore": "קרא עוד",
     "images": {
      "service1": "/images/clinic.jpg",
-      "service2": "/images/bg2.webp",
+      "service2": "/images/assesment.jpg",
       "service3": "/images/iac.jpg",
       "service4": "/images/podcast.jpg",
       "default": "/images/ronny.jpg"

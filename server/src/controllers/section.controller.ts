@@ -112,6 +112,7 @@ export const createSection = async (req: Request, res: Response) => {
             language: content.language,
             title: content.title,
             subtitle: content.subtitle,
+            bottomSubtitle: content.bottomSubtitle,
             content: content.content,
             imageUrl: content.imageUrl,
           })),
@@ -168,6 +169,7 @@ export const updateSection = async (req: Request, res: Response) => {
             data: {
               ...(content.title !== undefined && { title: content.title }),
               ...(content.subtitle !== undefined && { subtitle: content.subtitle }),
+              ...(content.bottomSubtitle !== undefined && { bottomSubtitle: content.bottomSubtitle }),
               ...(content.content !== undefined && { content: content.content }),
               ...(content.imageUrl !== undefined && { imageUrl: content.imageUrl }),
             },
@@ -188,6 +190,7 @@ export const updateSection = async (req: Request, res: Response) => {
               data: {
                 title: content.title,
                 subtitle: content.subtitle,
+                bottomSubtitle: content.bottomSubtitle,
                 content: content.content,
                 imageUrl: content.imageUrl,
               },
@@ -200,6 +203,7 @@ export const updateSection = async (req: Request, res: Response) => {
                 language: content.language,
                 title: content.title,
                 subtitle: content.subtitle,
+                bottomSubtitle: content.bottomSubtitle,
                 content: content.content,
                 imageUrl: content.imageUrl,
               },

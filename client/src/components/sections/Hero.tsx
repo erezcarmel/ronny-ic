@@ -9,11 +9,13 @@ import apiService from '@/lib/utils/api';
 interface HeroProps {
   title?: string;
   subtitle?: string;
+  bottomSubtitle?: string;
 }
 
 interface HeroContent {
   title: string;
   subtitle: string;
+  bottomSubtitle: string;
   content: string; // Button text
   imageUrl?: string;
 }
@@ -28,12 +30,13 @@ interface HeroData {
     language: string;
     title: string;
     subtitle: string;
+    bottomSubtitle: string;
     content: string;
     imageUrl?: string;
   }[];
 }
 
-export default function Hero({ title, subtitle }: HeroProps) {
+export default function Hero({ title, subtitle, bottomSubtitle }: HeroProps) {
   const { locale } = useLocale();
   const [translations, setTranslations] = useState<any>(null);
   const [isRtl, setIsRtl] = useState(false);
@@ -59,6 +62,7 @@ export default function Hero({ title, subtitle }: HeroProps) {
           setHeroData({
             title: content.title || '',
             subtitle: content.subtitle || '',
+            bottomSubtitle: content.bottomSubtitle || '',
             content: content.content || 'Contact Me', // Button text
             imageUrl: content.imageUrl
           });
@@ -84,7 +88,7 @@ export default function Hero({ title, subtitle }: HeroProps) {
 
   return (
     <section 
-      className="min-h-[60vh] flex items-center justify-center bg-cover bg-center bg-header-bg relative" 
+      className="hero min-h-[60vh] flex items-center justify-center bg-cover bg-center bg-header-bg relative" 
       style={backgroundStyle}
     >
       {/* Semi-transparent overlay */}
@@ -109,6 +113,19 @@ export default function Hero({ title, subtitle }: HeroProps) {
             >
               {subtitle || (heroData ? heroData.subtitle : translations.subtitle)}
             </motion.p>
+
+            {/* Bottom subtitle */}
+            {(bottomSubtitle || (heroData && heroData.bottomSubtitle) || (translations && translations.bottomSubtitle)) && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.9 }}
+                className="text-xs text-gray-700 max-w-lg mx-auto mt-6 prose prose-sm prose-gray"
+                dangerouslySetInnerHTML={{
+                  __html: bottomSubtitle || (heroData ? heroData.bottomSubtitle : translations.bottomSubtitle)
+                }}
+              />
+            )}
             
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -118,7 +135,7 @@ export default function Hero({ title, subtitle }: HeroProps) {
             >
               <a
                 href="#contact"
-                className="btn btn-outline text-lg px-8 py-3 shadow-lg hover:bg-[#ffffff66] hover:border-[#ffffff66]"
+                className="btn btn-outline text-lg px-8 py-3 shadow-lg bg-[#ffffff66] border-[#ffffff66] hover:bg-[#ffffff88] hover:border-[#ffffff88]"
                 aria-label="Contact me"
               >
                 {heroData ? heroData.content : (translations.contactMe || "Contact Me")}

@@ -51,7 +51,7 @@ const customStyles = `
     position: relative;
     width: fit-content;
     height: 100%;
-    max-height: 470px;
+    max-height: 500px;
     min-height: 300px;
     overflow: hidden;
     border-radius: 0.5rem;
@@ -407,16 +407,16 @@ export default function Services({
                       {selectedSectionId && serviceSections.map((section) => (
                         section.id === selectedSectionId && (
                           <div key={section.id}>
-                            <div className="w-full flex flex-col md:flex-row gap-4 max-w-screen-lg mx-auto" style={{ contain: 'paint layout' }}>
+                            <div className="w-full flex flex-col md:flex-row gap-4 max-w-screen-lg mx-auto pb-4" style={{ contain: 'paint layout' }}>
                               {/* Image Column */}
-                              <div className="flex justify-center px-8">
+                              <div className="flex justify-center">
                                 <div className="fixed-image-container">
                                   <Image
                                     src={resolveImagePath(section.imageUrl || t(`images.service${serviceSections.indexOf(section) + 1}` as any) || t('images.default'))}
                                     alt={section.title}
                                     width={500}
-                                    height={460}
-                                    className="w-full h-full object-cover max-h-[470px]"
+                                    height={500}
+                                    className="w-full h-full object-cover max-h-[500px]"
                                     onError={handleImageError}
                                     unoptimized={process.env.NODE_ENV === 'production'}
                                     loading="lazy"
@@ -450,13 +450,13 @@ export default function Services({
                                     </div>
                                     
                                     {/* Right side: Selected card content */}
-                                    <div className="hidden md:block w-full dark:bg-gray-800 px-6 min-h-[460px]">
+                                    <div className="hidden md:block w-full dark:bg-gray-800 px-6">
                                       {section.cards.some(card => expandedCards[card.id]) ? (
                                         section.cards.map((card) => (
                                           expandedCards[card.id] && (
                                             <div key={`content-${card.id}`} className="animate-fadeIn">
                                               {card.imageUrl && card.imageUrl.trim() !== '' && (
-                                                <div className="mb-4 overflow-hidden rounded-lg max-h-[460px]">
+                                                <div className="mb-4 overflow-hidden rounded-lg">
                                                   <Image
                                                     src={resolveImagePath(card.imageUrl)}
                                                     alt={card.title}

@@ -8,6 +8,12 @@
     "title": "Ronny Iss-Carmel",
     "subtitle": "Thoughts and Feelings Psychotherapy"
   },
+  "hero": {
+    "title": "Ronny Iss-Carmel",
+    "subtitle": "Thoughts and Feelings Psychotherapy",
+    "bottomSubtitle": "Professional psychological support for children, adolescents, young adults and parents",
+    "contactMe": "Contact Me"
+  },
   "about": {
     "title": "About Me"
   },
@@ -19,7 +25,7 @@
     "readMore": "Read More",
     "images": {
       "service1": "/images/clinic.jpg",
-      "service2": "/images/bg2.webp",
+      "service2": "/images/assesment.jpg",
       "service3": "/images/iac.jpg",
       "service4": "/images/podcast.jpg",
       "default": "/images/ronny.jpg"

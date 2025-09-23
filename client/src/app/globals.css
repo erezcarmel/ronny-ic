@@ -35,14 +35,22 @@ body {
   outline: none;
 }
 
-/* Section spacing */
-.section {
+.contact-section {
   @apply py-8 max-w-4xl mx-auto my-0;
+}
+.article-section, .services-section, .about-section {
+  .container-custom {
+    /* @apply max-w-4xl; */
 
-  &.article-section, &.services-section, &.about-section {
-    .container-custom {
-      @apply max-w-4xl;
+    h5 {
+      @apply text-xs;
     }
+  }
+}
+
+.hero {
+  .prose p {
+    @apply my-2;
   }
 }
 
