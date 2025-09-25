@@ -30,8 +30,8 @@ export default function LanguageSwitcher({ className }: { className?: string }) 
             className={cn(
               'px-2 py-1 text-sm rounded-md transition-colors text-gray-600',
               locale === loc
-                ? 'font-medium border border-[#B4C4F7]'
-                : 'hover:text-[#B4C4F7]'
+                ? 'font-medium border border-gray-900'
+                : 'hover:text-gray-900'
             )}
           >
             {loc === 'en' ? translations.english : translations.hebrew}

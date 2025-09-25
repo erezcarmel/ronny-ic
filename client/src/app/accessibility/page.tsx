@@ -19,7 +19,7 @@ export default function AccessibilityPage() {
           isRtl ? "rtl text-right" : "ltr text-left"
         }`}
       >
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+        <h1 className="text-3xl md:text-4xl font-bold text-[#555599] dark:text-white mb-6">
           Accessibility Statement
         </h1>
 

@@ -148,7 +148,7 @@ export default function Contact({ title }: ContactProps) {
                     <p className="text-gray-900 dark:text-white font-medium">{translations.phone}</p>
                     <a 
                       href={`tel:${contactInfo.phone.replace(/\D/g, '')}`} 
-                      className="text-[#555599] hover:underline"
+                      className="hover:underline"
                       target="_blank" 
                       rel="noopener noreferrer"
                     >
@@ -167,7 +167,7 @@ export default function Contact({ title }: ContactProps) {
                   </div>
                   <div className="ml-3 rtl:mr-3 rtl:ml-0" dir="ltr">
                     <p className="text-gray-900 dark:text-white font-medium">{translations.email}</p>
-                    <a href={`mailto:${contactInfo.email}`} className="text-[#555599] hover:underline">{contactInfo.email}</a>
+                    <a href={`mailto:${contactInfo.email}`} className="text-gray-900 hover:underline">{contactInfo.email}</a>
                   </div>
                 </li>
               )}
@@ -182,7 +182,7 @@ export default function Contact({ title }: ContactProps) {
                   </div>
                   <div className="ml-3 rtl:mr-3 rtl:ml-0" dir="ltr">
                     <p className="text-gray-900 dark:text-white font-medium">{translations.address}</p>
-                    <p className="text-[#555599] dark:text-gray-300">{contactInfo.address}</p>
+                    <p className="text-gray-900 dark:text-gray-300">{contactInfo.address}</p>
                   </div>
                 </li>
               )}
@@ -198,7 +198,7 @@ export default function Contact({ title }: ContactProps) {
                     <p className="text-gray-900 dark:text-white font-medium">{translations.whatsapp}</p>
                     <a 
                       href={`https://wa.me/${contactInfo.whatsapp.replace(/\D/g, '')}`} 
-                      className="text-[#555599] hover:underline"
+                      className="text-gray-900 hover:underline"
                       target="_blank" 
                       rel="noopener noreferrer"
                     >
@@ -211,13 +211,13 @@ export default function Contact({ title }: ContactProps) {
               {/* Fallback if no contact info is available */}
               {isLoadingContact && (
                 <li className="py-4 text-center">
-                  <p className="text-[#555599] dark:text-gray-400">{translations.loading || "Loading contact information..."}</p>
+                  <p className="text-gray-900 dark:text-gray-400">{translations.loading || "Loading contact information..."}</p>
                 </li>
               )}
               
               {!isLoadingContact && !contactInfo && (
                 <li className="py-4 text-center">
-                  <p className="text-[#555599] dark:text-gray-400">Contact information not available</p>
+                  <p className="text-gray-900 dark:text-gray-400">Contact information not available</p>
                 </li>
               )}
             </ul>
@@ -325,7 +325,7 @@ export default function Contact({ title }: ContactProps) {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="btn btn-secondary w-full"
+                className="btn w-full bg-[#DEE4FB] hover:bg-gray-100"
                 aria-label={isSubmitting ? translations.form.sending : translations.form.send}
               >
                 {isSubmitting ? translations.form.sending : translations.form.send}

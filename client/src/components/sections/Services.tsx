@@ -427,7 +427,7 @@ export default function Services({
                               {/* Content Column - Description, Cards */}
                               <div className="md:w-3/4 px-8 md:px-0">
                                 {section.description && section.description !== '<p><br></p>' && (
-                                  <div className="text-sm text-gray-700 dark:text-gray-300 mb-6 max-w-6xl">
+                                  <div className="text-sm text-gray-900 dark:text-gray-300 mb-6 max-w-6xl">
                                     <div dangerouslySetInnerHTML={{ __html: section.description }} />
                                   </div>
                                 )}

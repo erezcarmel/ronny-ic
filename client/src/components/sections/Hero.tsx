@@ -109,7 +109,7 @@ export default function Hero({ title, subtitle, bottomSubtitle }: HeroProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-xl md:text-2xl text-gray-800 text-shadow-sm max-w-xl mx-auto"
+              className="text-xl md:text-2xl text-gray-900 text-shadow-sm max-w-xl mx-auto"
             >
               {subtitle || (heroData ? heroData.subtitle : translations.subtitle)}
             </motion.p>
@@ -120,7 +120,7 @@ export default function Hero({ title, subtitle, bottomSubtitle }: HeroProps) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.9 }}
-                className="text-xs text-gray-700 max-w-lg mx-auto mt-6 prose prose-sm prose-gray"
+                className="text-xs text-gray-900 max-w-lg mx-auto mt-6 prose prose-sm prose-gray"
                 dangerouslySetInnerHTML={{
                   __html: bottomSubtitle || (heroData ? heroData.bottomSubtitle : translations.bottomSubtitle)
                 }}
