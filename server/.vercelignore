@@ -1,0 +1,9 @@
+# Ignore TypeScript compiled files in api directory (but keep api/index.js)
+api/**/*.js.map
+
+# Ignore build artifacts (but NOT dist/ - we need it for the compiled app)
+node_modules/
+*.log
+.env.local
+.env.*.local
+

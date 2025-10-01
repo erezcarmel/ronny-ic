@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { getMessages } from '@/i18n/config';
 import dynamic from 'next/dynamic';
-import Image from 'next/image';
-import apiService from '@/lib/utils/api';
 
 // Dynamically import the rich text editor to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
@@ -251,7 +249,6 @@ export default function ServicesForm({ initialData, onSubmit, onCancel }: Servic
   const [activeTab, setActiveTab] = useState<'en' | 'he'>('en');
   const [activeSectionIndex, setActiveSectionIndex] = useState(0);
   const [activeCardIndex, setActiveCardIndex] = useState(0);
-  const [isUploading, setIsUploading] = useState(false);
   
   useEffect(() => {
     getMessages(locale).then(messages => {
@@ -405,31 +402,6 @@ export default function ServicesForm({ initialData, onSubmit, onCancel }: Servic
     } else {
       setFormData(prev => ({ ...prev, sectionsHe: sections }));
     }
-  };
-  
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    
-    setIsUploading(true);
-    
-    try {
-      const response = await apiService.sections.uploadFile(file);
-      
-      if (response && response.url) {
-        // Update the card with the new image URL
-        handleCardChange(activeCardIndex, 'imageUrl', response.url);
-      }
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      alert('Failed to upload image. Please try again.');
-    } finally {
-      setIsUploading(false);
-    }
-  };
-  
-  const handleRemoveImage = () => {
-    handleCardChange(activeCardIndex, 'imageUrl', '');
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -682,51 +654,25 @@ export default function ServicesForm({ initialData, onSubmit, onCancel }: Servic
                         />
                       </div>
                       
-                      {/* Image Upload */}
+                      {/* Card Image URL */}
                       <div className="mb-4">
                         <label className="block text-gray-700 dark:text-gray-300 mb-2">
-                          Card Image
+                          Card Image URL
                         </label>
-                        {currentSections[activeSectionIndex].cards[activeCardIndex].imageUrl ? (
-                          <div className="mb-2">
-                            <div className="relative w-full h-40 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden mb-2">
-                              <Image
-                                src={currentSections[activeSectionIndex].cards[activeCardIndex].imageUrl}
-                                alt={currentSections[activeSectionIndex].cards[activeCardIndex].title}
-                                fill
-                                className="object-cover"
-                              />
-                            </div>
-                            <button
-                              type="button"
-                              onClick={handleRemoveImage}
-                              className="text-red-500 hover:text-red-700 text-sm"
-                            >
-                              Remove Image
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-center w-full">
-                            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700">
-                              <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                <svg className="w-8 h-8 mb-3 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                </svg>
-                                <p className="mb-1 text-sm text-gray-500 dark:text-gray-400">
-                                  {isUploading ? 'Uploading...' : 'Click to upload image'}
-                                </p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
-                                  PNG, JPG or GIF
-                                </p>
-                              </div>
-                              <input 
-                                type="file" 
-                                className="hidden" 
-                                accept="image/*" 
-                                onChange={handleImageUpload}
-                                disabled={isUploading}
-                              />
-                            </label>
+                        <input
+                          type="text"
+                          value={currentSections[activeSectionIndex].cards[activeCardIndex].imageUrl || ''}
+                          onChange={(e) => handleCardChange(activeCardIndex, 'imageUrl', e.target.value)}
+                          className="form-input w-full"
+                          placeholder="Enter image URL"
+                        />
+                        {currentSections[activeSectionIndex].cards[activeCardIndex].imageUrl && (
+                          <div className="mt-2">
+                            <img 
+                              src={currentSections[activeSectionIndex].cards[activeCardIndex].imageUrl}
+                              alt={currentSections[activeSectionIndex].cards[activeCardIndex].title}
+                              className="h-40 object-cover rounded"
+                            />
                           </div>
                         )}
                       </div>

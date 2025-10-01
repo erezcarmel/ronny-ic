@@ -51,4 +51,4 @@ const server = app.listen(PORT, () => {
     });
 });
 exports.default = app;
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=_index.js.map

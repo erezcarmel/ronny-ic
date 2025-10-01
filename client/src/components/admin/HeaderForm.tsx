@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useLocale } from '@/i18n/LocaleProvider';
 import { getMessages } from '@/i18n/config';
-import apiService from '@/lib/utils/api';
 
 interface HeaderFormProps {
   initialData?: any;
@@ -23,8 +22,6 @@ export default function HeaderForm({ initialData, onSubmit, onCancel }: HeaderFo
   const [subtitleHe, setSubtitleHe] = useState('');
   const [published, setPublished] = useState(true);
   const [logoImage, setLogoImage] = useState('');
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   
   useEffect(() => {
     getMessages(locale).then(messages => {
@@ -42,7 +39,6 @@ export default function HeaderForm({ initialData, onSubmit, onCancel }: HeaderFo
         setSubtitleEn(enContent.subtitle || '');
         if (enContent.imageUrl) {
           setLogoImage(enContent.imageUrl);
-          setImagePreview(enContent.imageUrl);
         }
       }
       
@@ -55,37 +51,11 @@ export default function HeaderForm({ initialData, onSubmit, onCancel }: HeaderFo
     }
   }, [initialData, locale]);
   
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      
-      // Create preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
-      let imageUrl = logoImage;
-      
-      // Upload image if a new one was selected
-      if (imageFile) {
-        try {
-          const uploadResponse = await apiService.sections.uploadFile(imageFile);
-          imageUrl = uploadResponse.url;
-        } catch (error) {
-          console.error('Error uploading image:', error);
-        }
-      }
-      
       // Prepare form data
       const formData = {
         published,
@@ -94,13 +64,13 @@ export default function HeaderForm({ initialData, onSubmit, onCancel }: HeaderFo
             language: 'en',
             title: titleEn,
             subtitle: subtitleEn,
-            imageUrl: imageUrl,
+            imageUrl: logoImage,
           },
           {
             language: 'he',
             title: titleHe,
             subtitle: subtitleHe,
-            imageUrl: imageUrl,
+            imageUrl: logoImage,
           }
         ],
       };
@@ -141,31 +111,26 @@ export default function HeaderForm({ initialData, onSubmit, onCancel }: HeaderFo
         {/* Logo image */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Logo Image
+            Logo Image URL
           </label>
           
-          {imagePreview && (
-            <div className="mb-4">
+          <input
+            type="text"
+            value={logoImage}
+            onChange={(e) => setLogoImage(e.target.value)}
+            placeholder="Enter logo image URL"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+          />
+          
+          {logoImage && (
+            <div className="mt-4">
               <img 
-                src={imagePreview} 
+                src={logoImage} 
                 alt="Logo preview" 
                 className="h-20 object-contain rounded-md"
               />
             </div>
           )}
-          
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="block w-full text-sm text-gray-500 dark:text-gray-400
-              file:mr-4 file:py-2 file:px-4
-              file:rounded-md file:border-0
-              file:text-sm file:font-semibold
-              file:bg-blue-50 file:text-blue-700
-              dark:file:bg-blue-900 dark:file:text-blue-200
-              hover:file:bg-blue-100 dark:hover:file:bg-blue-800"
-          />
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">

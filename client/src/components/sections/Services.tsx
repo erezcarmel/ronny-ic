@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useLocale } from '@/i18n/LocaleProvider';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import apiService from '@/lib/utils/api';
 import { resolveImagePath } from '@/lib/utils/imageUtils';
@@ -89,6 +89,7 @@ export default function Services({
   const [error, setError] = useState<string | null>(null);
   const [expandedCards, setExpandedCards] = useState<{[key: string]: boolean}>({});
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const prevSectionIdRef = useRef<string | null>(null);
   
   // Animation when section comes into view
   const [ref, inView] = useInView({
@@ -357,6 +358,26 @@ export default function Services({
     }
   }, [serviceSections, expandedCards, selectedSectionId]);
   
+  // Auto-select first card when section changes
+  useEffect(() => {
+    // Only run if the section ID has actually changed
+    if (selectedSectionId && selectedSectionId !== prevSectionIdRef.current && serviceSections.length > 0) {
+      const selectedSection = serviceSections.find(section => section.id === selectedSectionId);
+      if (selectedSection && selectedSection.cards && selectedSection.cards.length > 0) {
+        const firstCardId = selectedSection.cards[0].id;
+        setExpandedCards(prev => ({
+          ...Object.keys(prev).reduce((acc, key) => {
+            acc[key] = false;
+            return acc;
+          }, {} as {[key: string]: boolean}),
+          [firstCardId]: true
+        }));
+      }
+      // Update the ref to the current section ID
+      prevSectionIdRef.current = selectedSectionId;
+    }
+  }, [selectedSectionId, serviceSections]);
+  
   return (
     <section id="services" className={`services-section w-full max-w-full mx-auto ${isRtl ? 'pb-0' : 'pb-8'}`}>
       <style dangerouslySetInnerHTML={{ __html: customStyles }} />
@@ -450,7 +471,7 @@ export default function Services({
                                     </div>
                                     
                                     {/* Right side: Selected card content */}
-                                    <div className="hidden md:block w-full dark:bg-gray-800 px-6">
+                                    <div className="hidden md:block w-full dark:bg-gray-800 px-4">
                                       {section.cards.some(card => expandedCards[card.id]) ? (
                                         section.cards.map((card) => (
                                           expandedCards[card.id] && (

@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
-import path from 'path';
 
 // Get all articles
 export const getAllArticles = async (req: Request, res: Response) => {
@@ -270,37 +269,6 @@ export const deleteArticle = async (req: Request, res: Response) => {
     res.status(200).json({ message: 'Article deleted successfully' });
   } catch (error) {
     console.error('Delete article error:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
-// Upload file for article (PDF or image)
-export const uploadArticleFile = async (req: Request, res: Response) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
-    }
-
-    // Create media record
-    const media = await prisma.media.create({
-      data: {
-        filename: req.file.originalname,
-        path: req.file.path,
-        type: req.file.mimetype.startsWith('image/') ? 'image' : 'pdf',
-        size: req.file.size,
-        mimeType: req.file.mimetype,
-      },
-    });
-
-    // Generate URL for the uploaded file
-    const fileUrl = `/uploads/${path.basename(req.file.path)}`;
-
-    res.status(201).json({
-      media,
-      url: fileUrl,
-    });
-  } catch (error) {
-    console.error('Upload article file error:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };

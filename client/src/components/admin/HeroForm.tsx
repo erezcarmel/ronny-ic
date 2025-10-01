@@ -30,8 +30,6 @@ export default function HeroForm({ initialData, onSubmit, onCancel }: HeroFormPr
   const [buttonTextHe, setButtonTextHe] = useState('');
   const [published, setPublished] = useState(true);
   const [backgroundImage, setBackgroundImage] = useState('');
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   
   useEffect(() => {
     getMessages(locale).then(messages => {
@@ -51,7 +49,6 @@ export default function HeroForm({ initialData, onSubmit, onCancel }: HeroFormPr
         setButtonTextEn(enContent.content || 'Contact Me');
         if (enContent.imageUrl) {
           setBackgroundImage(enContent.imageUrl);
-          setImagePreview(enContent.imageUrl);
         }
       }
       
@@ -65,20 +62,6 @@ export default function HeroForm({ initialData, onSubmit, onCancel }: HeroFormPr
       }
     }
   }, [initialData, locale]);
-  
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      
-      // Create preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,31 +127,26 @@ export default function HeroForm({ initialData, onSubmit, onCancel }: HeroFormPr
         {/* Background image */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Background Image
+            Background Image URL
           </label>
           
-          {imagePreview && (
-            <div className="mb-4">
+          <input
+            type="text"
+            value={backgroundImage}
+            onChange={(e) => setBackgroundImage(e.target.value)}
+            placeholder="Enter background image URL"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+          />
+          
+          {backgroundImage && (
+            <div className="mt-4">
               <img 
-                src={imagePreview} 
+                src={backgroundImage} 
                 alt="Background preview" 
                 className="h-40 object-cover rounded-md"
               />
             </div>
           )}
-          
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="block w-full text-sm text-gray-500 dark:text-gray-400
-              file:mr-4 file:py-2 file:px-4
-              file:rounded-md file:border-0
-              file:text-sm file:font-semibold
-              file:bg-blue-50 file:text-blue-700
-              dark:file:bg-blue-900 dark:file:text-blue-200
-              hover:file:bg-blue-100 dark:hover:file:bg-blue-800"
-          />
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">

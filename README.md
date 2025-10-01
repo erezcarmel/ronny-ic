@@ -34,7 +34,6 @@ This is a monorepo containing both client and server applications:
 - PostgreSQL database
 - Prisma ORM
 - JWT authentication
-- File upload support
 
 ## Getting Started
 

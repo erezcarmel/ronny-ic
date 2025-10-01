@@ -1,22 +1,12 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadArticleFile = exports.deleteArticle = exports.updateArticle = exports.createArticle = exports.getArticleById = exports.getAllArticles = void 0;
+exports.deleteArticle = exports.updateArticle = exports.createArticle = exports.getArticleById = exports.getAllArticles = void 0;
 const prisma_1 = __importDefault(require("../utils/prisma"));
-const path_1 = __importDefault(require("path"));
 // Get all articles
-const getAllArticles = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllArticles = async (req, res) => {
     try {
         const { language = 'en', published } = req.query;
         // Build the where clause based on the published parameter
@@ -26,7 +16,7 @@ const getAllArticles = (req, res) => __awaiter(void 0, void 0, void 0, function*
             whereClause.isPublished = published === 'true';
         }
         // Get all articles with their contents
-        const articles = yield prisma_1.default.article.findMany({
+        const articles = await prisma_1.default.article.findMany({
             where: whereClause,
             include: {
                 contents: true, // Include all contents regardless of language
@@ -45,14 +35,14 @@ const getAllArticles = (req, res) => __awaiter(void 0, void 0, void 0, function*
         console.error('Get all articles error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
-});
+};
 exports.getAllArticles = getAllArticles;
 // Get article by ID
-const getArticleById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getArticleById = async (req, res) => {
     try {
         const { id } = req.params;
         const { language = 'en' } = req.query;
-        const article = yield prisma_1.default.article.findUnique({
+        const article = await prisma_1.default.article.findUnique({
             where: { id },
             include: {
                 contents: {
@@ -71,11 +61,10 @@ const getArticleById = (req, res) => __awaiter(void 0, void 0, void 0, function*
         console.error('Get article by ID error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
-});
+};
 exports.getArticleById = getArticleById;
 // Create new article
-const createArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+const createArticle = async (req, res) => {
     try {
         const { slug, isPublished = false, publishDate, contents } = req.body;
         // Validate input
@@ -83,14 +72,14 @@ const createArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             return res.status(400).json({ message: 'Slug and contents array are required' });
         }
         // Check if slug already exists
-        const existingArticle = yield prisma_1.default.article.findUnique({
+        const existingArticle = await prisma_1.default.article.findUnique({
             where: { slug },
         });
         if (existingArticle) {
             return res.status(409).json({ message: 'Article with this slug already exists' });
         }
         // Create article with contents
-        const article = yield prisma_1.default.article.create({
+        const article = await prisma_1.default.article.create({
             data: {
                 slug,
                 isPublished,
@@ -119,7 +108,7 @@ const createArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             return res.status(409).json({
                 message: 'Unique constraint failed',
                 details: 'An article with this slug or content language combination already exists.',
-                fields: (_a = error.meta) === null || _a === void 0 ? void 0 : _a.target
+                fields: error.meta?.target
             });
         }
         res.status(500).json({
@@ -127,16 +116,15 @@ const createArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             details: error.message || String(error)
         });
     }
-});
+};
 exports.createArticle = createArticle;
 // Update article
-const updateArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+const updateArticle = async (req, res) => {
     try {
         const { id } = req.params;
         const { slug, isPublished, publishDate, contents } = req.body;
         // Check if article exists
-        const existingArticle = yield prisma_1.default.article.findUnique({
+        const existingArticle = await prisma_1.default.article.findUnique({
             where: { id },
         });
         if (!existingArticle) {
@@ -144,7 +132,7 @@ const updateArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         }
         // Check if slug is unique if changing
         if (slug && slug !== existingArticle.slug) {
-            const slugExists = yield prisma_1.default.article.findUnique({
+            const slugExists = await prisma_1.default.article.findUnique({
                 where: { slug },
             });
             if (slugExists) {
@@ -152,9 +140,13 @@ const updateArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             }
         }
         // Update article
-        const updatedArticle = yield prisma_1.default.article.update({
+        const updatedArticle = await prisma_1.default.article.update({
             where: { id },
-            data: Object.assign(Object.assign(Object.assign({}, (slug && { slug })), (isPublished !== undefined && { isPublished })), (publishDate !== undefined && { publishDate: publishDate ? new Date(publishDate) : null })),
+            data: {
+                ...(slug && { slug }),
+                ...(isPublished !== undefined && { isPublished }),
+                ...(publishDate !== undefined && { publishDate: publishDate ? new Date(publishDate) : null }),
+            },
             include: {
                 contents: true,
             },
@@ -164,14 +156,20 @@ const updateArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             for (const content of contents) {
                 if (content.id) {
                     // Update existing content with ID
-                    yield prisma_1.default.articleContent.update({
+                    await prisma_1.default.articleContent.update({
                         where: { id: content.id },
-                        data: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, (content.title !== undefined && { title: content.title })), (content.excerpt !== undefined && { excerpt: content.excerpt })), (content.content !== undefined && { content: content.content })), (content.pdfUrl !== undefined && { pdfUrl: content.pdfUrl })), (content.imageUrl !== undefined && { imageUrl: content.imageUrl })),
+                        data: {
+                            ...(content.title !== undefined && { title: content.title }),
+                            ...(content.excerpt !== undefined && { excerpt: content.excerpt }),
+                            ...(content.content !== undefined && { content: content.content }),
+                            ...(content.pdfUrl !== undefined && { pdfUrl: content.pdfUrl }),
+                            ...(content.imageUrl !== undefined && { imageUrl: content.imageUrl }),
+                        },
                     });
                 }
                 else {
                     // Check if content for this language already exists
-                    const existingContent = yield prisma_1.default.articleContent.findFirst({
+                    const existingContent = await prisma_1.default.articleContent.findFirst({
                         where: {
                             articleId: id,
                             language: content.language
@@ -179,14 +177,20 @@ const updateArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                     });
                     if (existingContent) {
                         // Update existing content for this language
-                        yield prisma_1.default.articleContent.update({
+                        await prisma_1.default.articleContent.update({
                             where: { id: existingContent.id },
-                            data: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, (content.title !== undefined && { title: content.title })), (content.excerpt !== undefined && { excerpt: content.excerpt })), (content.content !== undefined && { content: content.content })), (content.pdfUrl !== undefined && { pdfUrl: content.pdfUrl })), (content.imageUrl !== undefined && { imageUrl: content.imageUrl })),
+                            data: {
+                                ...(content.title !== undefined && { title: content.title }),
+                                ...(content.excerpt !== undefined && { excerpt: content.excerpt }),
+                                ...(content.content !== undefined && { content: content.content }),
+                                ...(content.pdfUrl !== undefined && { pdfUrl: content.pdfUrl }),
+                                ...(content.imageUrl !== undefined && { imageUrl: content.imageUrl }),
+                            },
                         });
                     }
                     else {
                         // Create new content
-                        yield prisma_1.default.articleContent.create({
+                        await prisma_1.default.articleContent.create({
                             data: {
                                 articleId: id,
                                 language: content.language,
@@ -202,7 +206,7 @@ const updateArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             }
         }
         // Get updated article with contents
-        const articleWithContents = yield prisma_1.default.article.findUnique({
+        const articleWithContents = await prisma_1.default.article.findUnique({
             where: { id },
             include: {
                 contents: true,
@@ -217,7 +221,7 @@ const updateArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             return res.status(409).json({
                 message: 'Unique constraint failed',
                 details: 'An article content with this language already exists for this article.',
-                fields: (_a = error.meta) === null || _a === void 0 ? void 0 : _a.target
+                fields: error.meta?.target
             });
         }
         res.status(500).json({
@@ -225,21 +229,21 @@ const updateArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             details: error.message || String(error)
         });
     }
-});
+};
 exports.updateArticle = updateArticle;
 // Delete article
-const deleteArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteArticle = async (req, res) => {
     try {
         const { id } = req.params;
         // Check if article exists
-        const existingArticle = yield prisma_1.default.article.findUnique({
+        const existingArticle = await prisma_1.default.article.findUnique({
             where: { id },
         });
         if (!existingArticle) {
             return res.status(404).json({ message: 'Article not found' });
         }
         // Delete article (cascade will delete contents)
-        yield prisma_1.default.article.delete({
+        await prisma_1.default.article.delete({
             where: { id },
         });
         res.status(200).json({ message: 'Article deleted successfully' });
@@ -248,35 +252,6 @@ const deleteArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         console.error('Delete article error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
-});
+};
 exports.deleteArticle = deleteArticle;
-// Upload file for article (PDF or image)
-const uploadArticleFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ message: 'No file uploaded' });
-        }
-        // Create media record
-        const media = yield prisma_1.default.media.create({
-            data: {
-                filename: req.file.originalname,
-                path: req.file.path,
-                type: req.file.mimetype.startsWith('image/') ? 'image' : 'pdf',
-                size: req.file.size,
-                mimeType: req.file.mimetype,
-            },
-        });
-        // Generate URL for the uploaded file
-        const fileUrl = `/uploads/${path_1.default.basename(req.file.path)}`;
-        res.status(201).json({
-            media,
-            url: fileUrl,
-        });
-    }
-    catch (error) {
-        console.error('Upload article file error:', error);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-});
-exports.uploadArticleFile = uploadArticleFile;
 //# sourceMappingURL=article.controller.js.map

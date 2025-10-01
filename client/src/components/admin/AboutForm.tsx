@@ -73,15 +73,6 @@ export default function AboutForm({ initialData, onSubmit, onCancel }: AboutForm
     }
   };
   
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      // In a real application, you would upload the file to a server
-      // and get back a URL. For now, we'll just use a placeholder.
-      setFormData(prev => ({ ...prev, imageUrl: URL.createObjectURL(files[0]) }));
-    }
-  };
-  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -108,23 +99,24 @@ export default function AboutForm({ initialData, onSubmit, onCancel }: AboutForm
       <form onSubmit={handleSubmit}>
         <div className="mb-6">
           <label className="block text-gray-700 dark:text-gray-300 mb-2">
-            Image
+            Image URL
           </label>
-          <div className="flex items-center space-x-4">
-            <div className="w-24 h-24 relative">
+          <input 
+            type="text" 
+            value={formData.imageUrl}
+            onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
+            placeholder="Enter image URL"
+            className="form-input w-full"
+          />
+          {formData.imageUrl && (
+            <div className="mt-2 w-24 h-24 relative">
               <img 
                 src={formData.imageUrl} 
                 alt="About section image" 
                 className="w-full h-full object-cover rounded"
               />
             </div>
-            <input 
-              type="file" 
-              accept="image/*"
-              onChange={handleImageChange}
-              className="form-input"
-            />
-          </div>
+          )}
         </div>
         
         <div className="mb-4">

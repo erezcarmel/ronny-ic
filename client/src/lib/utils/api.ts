@@ -144,15 +144,6 @@ export const apiService = {
       apiRequest('PUT', `/sections/${id}`, data),
     delete: (id: string) => 
       apiRequest('DELETE', `/sections/${id}`),
-    uploadFile: (file: File) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      return apiRequest('POST', '/sections/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-    },
   },
   
   // Articles endpoints
@@ -180,15 +171,6 @@ export const apiService = {
       apiRequest('PUT', `/articles/${id}`, data),
     delete: (id: string) => 
       apiRequest('DELETE', `/articles/${id}`),
-    uploadFile: (file: File) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      return apiRequest('POST', '/articles/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-    },
   },
   
   // Contact endpoints

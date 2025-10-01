@@ -98,8 +98,6 @@
       "title": "Title",
       "excerpt": "Excerpt",
       "content": "Content",
-      "uploadPdf": "Upload PDF",
-      "uploadImage": "Upload Image",
       "save": "Save",
       "cancel": "Cancel",
       "loading": "Loading articles...",

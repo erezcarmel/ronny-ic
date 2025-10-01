@@ -35,9 +35,6 @@ export default function ArticleForm({ articleId, onCancel, onSuccess }: ArticleF
   const [translations, setTranslations] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   
   const [formData, setFormData] = useState<ArticleFormData>({
     slug: '',
@@ -108,17 +105,6 @@ export default function ArticleForm({ articleId, onCancel, onSuccess }: ArticleF
         });
       }
       
-      // Set image preview if available
-      const hebrewContent = contents.find((content: any) => content.language === 'he');
-      const englishContent = contents.find((content: any) => content.language === 'en');
-      
-      // Prefer Hebrew content's image URL, fall back to English if needed
-      if (hebrewContent?.imageUrl) {
-        setImagePreview(hebrewContent.imageUrl);
-      } else if (englishContent?.imageUrl) {
-        setImagePreview(englishContent.imageUrl);
-      }
-      
       setFormData({
         slug: article.slug,
         isPublished: article.isPublished,
@@ -157,54 +143,12 @@ export default function ArticleForm({ articleId, onCancel, onSuccess }: ArticleF
     setFormData({ ...formData, contents: updatedContents });
   };
   
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setImageFile(file);
-      
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-  
-  const handlePdfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setPdfFile(e.target.files[0]);
-    }
-  };
-  
-  const uploadFile = async (file: File) => {
-    try {
-      const result = await apiService.articles.uploadFile(file);
-      return result.url;
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      throw new Error('Failed to upload file');
-    }
-  };
-  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
       setIsLoading(true);
       setError(null);
-      
-      // Upload image if selected
-      let imageUrl: string | undefined;
-      if (imageFile) {
-        imageUrl = await uploadFile(imageFile);
-      }
-      
-      // Upload PDF if selected
-      let pdfUrl: string | undefined;
-      if (pdfFile) {
-        pdfUrl = await uploadFile(pdfFile);
-      }
       
       // Get Hebrew content for fallback
       const hebrewContent = formData.contents.find(c => c.language === 'he');
@@ -215,7 +159,7 @@ export default function ArticleForm({ articleId, onCancel, onSuccess }: ArticleF
         throw new Error('Please provide all required Hebrew content (title, excerpt, and content)');
       }
       
-      // Update contents with file URLs and apply fallback logic
+      // Apply fallback logic for English content
       const updatedContents = formData.contents.map(content => {
         if (content.language === 'en') {
           // Always use Hebrew content as fallback for any empty English fields
@@ -224,17 +168,11 @@ export default function ArticleForm({ articleId, onCancel, onSuccess }: ArticleF
             title: content.title || hebrewContent?.title || '',
             excerpt: content.excerpt || hebrewContent?.excerpt || '',
             content: content.content || hebrewContent?.content || '',
-            imageUrl: imageUrl || content.imageUrl || hebrewContent?.imageUrl,
-            pdfUrl: pdfUrl || content.pdfUrl || hebrewContent?.pdfUrl,
-          };
-        } else {
-          // Hebrew content (required)
-          return {
-            ...content,
-            imageUrl: imageUrl || content.imageUrl,
-            pdfUrl: pdfUrl || content.pdfUrl,
+            imageUrl: content.imageUrl || hebrewContent?.imageUrl,
+            pdfUrl: content.pdfUrl || hebrewContent?.pdfUrl,
           };
         }
+        return content;
       });
       
       // Keep all content entries
@@ -417,51 +355,6 @@ export default function ArticleForm({ articleId, onCancel, onSuccess }: ArticleF
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={10}
             />
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div>
-            <label htmlFor="image" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {translations.featuredImage}
-            </label>
-            <input
-              type="file"
-              id="image"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {imagePreview && (
-              <div className="mt-2">
-                <img src={imagePreview} alt="Preview" className="h-32 object-contain" />
-              </div>
-            )}
-          </div>
-          
-          <div>
-            <label htmlFor="pdf" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {translations.pdfAttachment}
-            </label>
-            <input
-              type="file"
-              id="pdf"
-              accept=".pdf"
-              onChange={handlePdfChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {(formData.contents.find(c => c.language === 'he')?.pdfUrl || formData.contents.find(c => c.language === 'en')?.pdfUrl) && (
-              <div className="mt-2">
-                <a 
-                  href={formData.contents.find(c => c.language === 'he')?.pdfUrl || formData.contents.find(c => c.language === 'en')?.pdfUrl || ''} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="text-blue-600 hover:underline"
-                >
-                  {translations.viewCurrentPdf}
-                </a>
-              </div>
-            )}
           </div>
         </div>
         
