@@ -69,20 +69,23 @@ export default function About({ title, content, imageUrl }: AboutProps) {
   // Get content from section data or fallback to props
   const sectionContent = sectionData?.contents?.[0]?.content || content;
   const sectionImage = sectionData?.contents?.[0]?.imageUrl || imageUrl;
-  
+
   // Process image URL to ensure it works correctly in all environments
   // Use local image from public folder as fallback
-  const localImagePath = '/images/ronny.jpg';
-  
-  const processedImageUrl = sectionImage ? 
-    sectionImage.startsWith('blob:') ? 
-      // For blob URLs, use local image instead
-      localImagePath : 
-      sectionImage : 
-    localImagePath;
+  const localImagePath = "/images/ronny.jpg";
+
+  const processedImageUrl = sectionImage
+    ? sectionImage.startsWith("blob:")
+      ? // For blob URLs, use local image instead
+        localImagePath
+      : sectionImage
+    : localImagePath;
 
   return (
-    <section id="about" className="about-section pb-8 bg-white dark:bg-gray-900">
+    <section
+      id="about"
+      className="about-section pb-8 bg-white dark:bg-gray-900"
+    >
       <div className="container-custom">
         {loading ? (
           <div className="flex justify-center items-center py-12">
@@ -98,7 +101,7 @@ export default function About({ title, content, imageUrl }: AboutProps) {
             className={`${isRtl ? "rtl" : "ltr"}`}
           >
             <div className="flex flex-col md:flex-row gap-8 items-stretch min-h-[400px] max-w-screen-lg mx-auto">
-              <div className={`${isRtl ? "order-2" : "order-1"} flex-1`}>
+              <div className={`${isRtl ? "order-2 md:order-1" : "order-2 md:order-1"} flex-1`}>
                 <div className="max-w-none h-full text-sm pt-8">
                   {sectionContent && (
                     <div dangerouslySetInnerHTML={{ __html: sectionContent }} />
@@ -106,7 +109,11 @@ export default function About({ title, content, imageUrl }: AboutProps) {
                 </div>
               </div>
 
-              <div className={`rounded-lg overflow-hidden shadow-lg h-full max-w-[300px] flex items-center justify-center align-middle mt-6 my-0 mx-auto ${isRtl ? "order-1" : "order-2"}`}>
+              <div
+                className={`rounded-lg overflow-hidden shadow-lg h-full max-w-[300px] flex items-center justify-center align-middle mt-6 my-0 mx-auto ${
+                  isRtl ? "order-1 md:order-2" : "order-1 md:order-2"
+                }`}
+              >
                 <Image
                   src={processedImageUrl}
                   alt="About me"
@@ -114,8 +121,8 @@ export default function About({ title, content, imageUrl }: AboutProps) {
                   height={400}
                   className="w-full h-full object-cover md:min-h-[440px]"
                   priority
-                  unoptimized={!processedImageUrl.startsWith('/')} // Only optimize local images
-                  style={{ maxWidth: '300px', height: '100%' }}
+                  unoptimized={!processedImageUrl.startsWith("/")} // Only optimize local images
+                  style={{ maxWidth: "300px", height: "100%" }}
                 />
               </div>
             </div>
