@@ -39,12 +39,17 @@ body {
   @apply py-8 max-w-4xl mx-auto my-0;
 }
 .article-section, .services-section, .about-section {
+  p {
+    @apply mt-0;
+  }
   .container-custom {
     /* @apply max-w-4xl; */
 
     h5 {
       @apply text-xs;
     }
+
+    
   }
 }
 

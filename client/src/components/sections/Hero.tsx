@@ -88,13 +88,13 @@ export default function Hero({ title, subtitle, bottomSubtitle }: HeroProps) {
 
   return (
     <section 
-      className="hero min-h-[60vh] flex items-center justify-center bg-cover bg-center bg-header-bg relative" 
+      className="hero min-h-[70vh] md:min-h-[60vh] flex items-center justify-center bg-cover bg-center bg-header-bg relative" 
       style={backgroundStyle}
     >
       {/* Semi-transparent overlay */}
       <div className="absolute inset-0 bg-[#DEE4FB] opacity-70"></div>
       
-      <div className="container-custom relative z-10 pt-12">
+      <div className="container-custom relative z-10 pt-24 md:pt-12">
         <div className={`text-center ${isRtl ? 'rtl' : 'ltr'}`}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}

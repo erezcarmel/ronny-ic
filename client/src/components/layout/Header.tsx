@@ -110,7 +110,7 @@ export default function Header() {
         'fixed top-0 w-full z-50 transition-all duration-300',
         isScrolled
           ? 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-md py-2'
-          : 'bg-transparent py-4'
+          : 'md:bg-transparent py-4 bg-white/90'
       )}
       role="banner"
     >
@@ -128,7 +128,7 @@ export default function Header() {
               <span className="font-varela text-xl md:text-2xl font-bold text-gray-600">
                 {headerData?.title || translations.title}
               </span>
-              <span className="font-varela md:text-sm font-bold text-gray-600 hidden sm:block">
+              <span className="font-varela md:text-sm font-bold text-gray-600 hidden md:block">
                 {headerData?.subtitle || translations.subtitle}
               </span>
             </div>

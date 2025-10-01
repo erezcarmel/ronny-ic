@@ -513,7 +513,7 @@ export default function Services({
                                         expandedCards[card.id] && (
                                           <div 
                                             key={`mobile-content-${card.id}`} 
-                                            className="p-4 mt-2"
+                                            className="p-0 mt-0 md:p-4 md:mt-2"
                                           >
                                             {card.imageUrl && card.imageUrl.trim() !== '' && (
                                               <div className="mb-4 overflow-hidden rounded-lg">
