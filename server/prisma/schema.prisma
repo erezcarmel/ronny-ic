@@ -85,6 +85,7 @@ model ContactInfo {
   phone     String?
   email     String?
   whatsapp  String?
+  instagram String?
   address   String?  @db.Text
   mapUrl    String?
   createdAt DateTime @default(now())

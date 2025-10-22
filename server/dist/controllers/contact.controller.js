@@ -85,7 +85,7 @@ exports.getContactInfo = getContactInfo;
 // Update contact information
 const updateContactInfo = async (req, res) => {
     try {
-        const { language, phone, email, whatsapp, address, mapUrl } = req.body;
+        const { language, phone, email, whatsapp, instagram, address, mapUrl } = req.body;
         // Validate input
         if (!language) {
             return res.status(400).json({ message: 'Language is required' });
@@ -107,6 +107,7 @@ const updateContactInfo = async (req, res) => {
                     ...(phone !== undefined && { phone }),
                     ...(email !== undefined && { email }),
                     ...(whatsapp !== undefined && { whatsapp }),
+                    ...(instagram !== undefined && { instagram }),
                     ...(address !== undefined && { address }),
                     ...(mapUrl !== undefined && { mapUrl }),
                 },
@@ -120,6 +121,7 @@ const updateContactInfo = async (req, res) => {
                     phone,
                     email,
                     whatsapp,
+                    instagram,
                     address,
                     mapUrl,
                 },

@@ -12,6 +12,7 @@ interface ContactInfoData {
   phone: string;
   email: string;
   whatsapp: string;
+  instagram: string;
   address: string;
   mapUrl?: string;
 }
@@ -29,6 +30,7 @@ export default function ContactPage() {
     phone: '',
     email: '',
     whatsapp: '',
+    instagram: '',
     address: '',
     mapUrl: ''
   });
@@ -60,6 +62,7 @@ export default function ContactPage() {
             phone: data.phone || '',
             email: data.email || '',
             whatsapp: data.whatsapp || '',
+            instagram: data.instagram || '',
             address: data.address || '',
             mapUrl: data.mapUrl || ''
           });
@@ -184,6 +187,21 @@ export default function ContactPage() {
               value={contactInfo.whatsapp}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="instagram" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Instagram
+            </label>
+            <input
+              type="text"
+              id="instagram"
+              name="instagram"
+              value={contactInfo.instagram}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="@username or profile URL"
             />
           </div>
           
