@@ -217,12 +217,12 @@ export default function Contact({ title }: ContactProps) {
                   <div className="ml-3 rtl:mr-3 rtl:ml-0" dir="ltr">
                     <p className="text-gray-900 dark:text-white font-medium">Instagram</p>
                     <a 
-                      href={contactInfo.instagram.startsWith('http') ? `@${contactInfo.instagram}` : `https://instagram.com/${contactInfo.instagram}`}
+      href={contactInfo.instagram.startsWith('http') ? contactInfo.instagram : `https://instagram.com/${contactInfo.instagram.replace('@', '')}`}
                       className="text-gray-900 hover:underline"
                       target="_blank" 
                       rel="noopener noreferrer"
                     >
-                      {contactInfo.instagram}
+                      {`@${contactInfo.instagram}`}
                     </a>
                   </div>
                 </li>
